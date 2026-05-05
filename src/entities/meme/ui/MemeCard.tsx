@@ -21,8 +21,8 @@ export const MemeCard: FC<TProps> = ({ meme }) => {
       </Link>
 
       <div className="flex justify-between mt-2">
-        <LikeButton /*memeId={meme.id}*/ />
-        <FavoriteButton /*memeId={meme.id}*/ />
+        <LikeButton memeId={meme.id} />
+        <FavoriteButton memeId={meme.id} />
       </div>
     </div>
   )
