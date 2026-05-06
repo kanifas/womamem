@@ -1,7 +1,14 @@
 import { getMemeBySlug } from '@/entities/meme/api/getMemeBySlug'
 
-export default async function MemePage({ params }) {
-  const meme = await getMemeBySlug(params.slug)
+type Props = {
+  params: {
+    slug: string
+  }
+}
+
+export default async function MemePage({ params }: Props) {
+  const { slug } = await params
+  const meme = await getMemeBySlug(slug)
 
   if (!meme) return <div>Not found</div>
 

@@ -1,5 +1,5 @@
-import { getMemeBySlug } from '@/entities/meme/api/getMemeBySlug'
-import { useRouter } from 'next/navigation'
+import { MemeModalClient } from './MemeModalClient'
+import { getMemes } from '@/entities/meme/api/getMemes'
 
 type Props = {
   params: {
@@ -8,11 +8,13 @@ type Props = {
 }
 
 export default async function MemeModal({ params }: Props) {
-  const meme = await getMemeBySlug(params.slug)
+  const { slug } = await params
+  const memes = await getMemes()
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center">
-      <img src={meme?.previewUrl} className="max-h-[90%]" />
-    </div>
+    <MemeModalClient
+      initialSlug={slug}
+      memes={memes}
+    />
   )
 }
