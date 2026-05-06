@@ -1,0 +1,1 @@
+ALTER TABLE "meme" ADD COLUMN "preview_url" text;
