@@ -2,6 +2,7 @@
 
 import { FC, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useMemeViewerStore } from '@/widgets/meme-viewer/model/store'
 import { TMeme } from '@/entities'
 
@@ -12,8 +13,8 @@ type Props = {
 
 export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
   const router = useRouter()
-  const startX = useRef(0)
-  const endX = useRef(0)
+  // const startX = useRef(0)
+  // const endX = useRef(0)
   const isSwiping = useRef(false)
 
   const {
@@ -84,55 +85,94 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
     }
   }, [currentMeme, getNextMem, getPrevMem])
 
-  const onTouchStart = (e: React.TouchEvent) => {
-    startX.current = e.touches[0].clientX;
-    isSwiping.current = false // сбрасываем
-  }
+  // const onTouchStart = (e: React.TouchEvent) => {
+  //   startX.current = e.touches[0].clientX;
+  //   isSwiping.current = false // сбрасываем
+  // }
 
-  const onTouchMove = (e: React.TouchEvent) => {
-    endX.current = e.touches[0].clientX
+  // const onTouchMove = (e: React.TouchEvent) => {
+  //   endX.current = e.touches[0].clientX
 
-    if (Math.abs(startX.current - endX.current) > 10) {
-      isSwiping.current = true
-    }
-  }
+  //   if (Math.abs(startX.current - endX.current) > 10) {
+  //     isSwiping.current = true
+  //   }
+  // }
 
-  const onTouchEnd = () => {
-    const diff = startX.current - endX.current
+  // const onTouchEnd = () => {
+  //   const diff = startX.current - endX.current
 
-    if (Math.abs(diff) < 50) return // игнор мелких движений
+  //   if (Math.abs(diff) < 50) return // игнор мелких движений
 
-    if (diff > 0) {
-      // свайп влево → следующий
-      next()
-    } else {
-      // свайп вправо → предыдущий
-      prev()
-    }
-  }
+  //   if (diff > 0) {
+  //     // свайп влево → следующий
+  //     next()
+  //   } else {
+  //     // свайп вправо → предыдущий
+  //     prev()
+  //   }
+  // }
 
   return (
     <div
-      className="fixed inset-0 bg-black/90 flex items-center justify-center"
-      onClick={() => {
-        if (isSwiping.current) return
-        router.back()
-      }}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
+      className="fixed inset-0 bg-black/90 flex items-center justify-center overflow-hidden"
+      onClick={() => router.back()}
     >
-      <div onClick={(e) => e.stopPropagation()}>
-        <img
-          src={currentMeme.previewUrl}
-          className="max-h-[90vh]"
-        />
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={currentMeme.id}
+          className="relative"
+          onClick={(e) => e.stopPropagation()}
 
-        <div className="flex justify-between">
-          <button className="text-emerald-400 font-bold text-4xl bg-amber-50 cursor-pointer" onClick={prev}>←</button>
-          <button className="text-emerald-400 font-bold text-4xl bg-amber-50  cursor-pointer" onClick={next}>→</button>
-        </div>
-      </div>
+          // 👉 drag
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+
+          // 👉 инерция + “резиновость”
+          dragElastic={0.2}
+
+          // 👉 основной момент — snap логика
+          onDragEnd={(e, info) => {
+            const offset = info.offset.x
+            const velocity = info.velocity.x
+
+            // свайп влево → следующий
+            if (offset < -100 || velocity < -500) {
+              next()
+            }
+            // свайп вправо → предыдущий
+            else if (offset > 100 || velocity > 500) {
+              prev()
+            }
+          }}
+
+          // 👉 анимации входа/выхода
+          initial={{ x: 300, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: -300, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        >
+          <img
+            src={currentMeme.previewUrl}
+            className="max-h-[90vh] max-w-[90vw] object-contain select-none pointer-events-none"
+            draggable={false}
+          />
+
+          {/* стрелки */}
+          <button
+            onClick={prev}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-2xl"
+          >
+            ←
+          </button>
+
+          <button
+            onClick={next}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-2xl"
+          >
+            →
+          </button>
+        </motion.div>
+      </AnimatePresence>
     </div>
   )
 }
