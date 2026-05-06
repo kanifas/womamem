@@ -1,4 +1,4 @@
-import { getMemeBySlug } from '@/entities/meme/api/getMemeBySlug'
+import { getMemeBySlug } from '@/entities/server'
 
 type Props = {
   params: {

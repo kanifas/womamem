@@ -1,5 +1,5 @@
 import { MemeModalClient } from './MemeModalClient'
-import { getMemes } from '@/entities/meme/api/getMemes'
+import { getMemes } from '@/entities/server'
 
 type Props = {
   params: {
