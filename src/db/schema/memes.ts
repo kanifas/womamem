@@ -10,7 +10,7 @@ import {
 } from 'drizzle-orm/pg-core'
 
 // если используешь relations
-import { relations } from 'drizzle-orm'
+// import { relations } from 'drizzle-orm'
 
 // ---- TABLE ----
 
@@ -24,6 +24,8 @@ export const memes = pgTable(
     slug: text('slug').notNull(),
 
     description: text('description'),
+
+    previewUrl: text('preview_url'),
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
 
