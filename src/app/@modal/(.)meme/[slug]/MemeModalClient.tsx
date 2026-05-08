@@ -13,21 +13,16 @@ type Props = {
 
 export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
   const router = useRouter()
-  // const startX = useRef(0)
-  // const endX = useRef(0)
-  const isSwiping = useRef(false)
-
-  const {
-    setMemes,
-    openBySlug,
-    // memes: storeMemes,
-    _currentIndex,
-    next,
-    prev,
-    getCurrentMem,
-    getNextMem,
-    getPrevMem,
-  } = useMemeViewerStore()
+  // const { memes: storeMemes } = useMemeViewerStore((s) => s.memes)
+  const setMemes = useMemeViewerStore((s) => s.setMemes)
+  const openBySlug = useMemeViewerStore((s) => s.openBySlug)
+  const currentIndex = useMemeViewerStore((s) => s.currentIndex)
+  const getCurrentMem = useMemeViewerStore((s) => s.getCurrentMem)
+  const getNextMem = useMemeViewerStore((s) => s.getNextMem)
+  const getPrevMem = useMemeViewerStore((s) => s.getPrevMem)
+  const direction = useMemeViewerStore((s) => s.direction)
+  const next = useMemeViewerStore((s) => s.next)
+  const prev = useMemeViewerStore((s) => s.prev)
 
   useEffect(() => {
     setMemes(memes)
@@ -36,8 +31,10 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
 
   useEffect(() => {
     const currentMeme = getCurrentMem()
-    router.replace(`/meme/${currentMeme.slug}`)
-  }, [_currentIndex, router, getCurrentMem])
+    setTimeout(() => {
+      router.replace(`/meme/${currentMeme.slug}`)
+    }, 20)
+  }, [currentIndex, router, getCurrentMem])
 
   // const onNextClick = () => {
   //   next()
@@ -85,71 +82,68 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
     }
   }, [currentMeme, getNextMem, getPrevMem])
 
-  // const onTouchStart = (e: React.TouchEvent) => {
-  //   startX.current = e.touches[0].clientX;
-  //   isSwiping.current = false // сбрасываем
-  // }
-
-  // const onTouchMove = (e: React.TouchEvent) => {
-  //   endX.current = e.touches[0].clientX
-
-  //   if (Math.abs(startX.current - endX.current) > 10) {
-  //     isSwiping.current = true
-  //   }
-  // }
-
-  // const onTouchEnd = () => {
-  //   const diff = startX.current - endX.current
-
-  //   if (Math.abs(diff) < 50) return // игнор мелких движений
-
-  //   if (diff > 0) {
-  //     // свайп влево → следующий
-  //     next()
-  //   } else {
-  //     // свайп вправо → предыдущий
-  //     prev()
-  //   }
-  // }
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      x: direction > 0 ? -300 : 300,
+      opacity: 0,
+    }),
+  }
 
   return (
     <div
       className="fixed inset-0 bg-black/90 flex items-center justify-center overflow-hidden"
       onClick={() => router.back()}
     >
-      <AnimatePresence initial={false}>
+      <AnimatePresence initial={false} custom={direction} mode='wait'>
         <motion.div
-          key={currentMeme.id}
+          key={currentIndex}
           className="relative"
           onClick={(e) => e.stopPropagation()}
+
+          layout={false}
+          custom={direction}
+          variants={variants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          dragMomentum={false}
 
           // 👉 drag
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
 
           // 👉 инерция + “резиновость”
-          dragElastic={0.2}
+          dragElastic={0.3}
+
+          // говорит браузеру: “я сам обрабатываю горизонтальные жесты”
+          style={{ touchAction: 'pan-y' }}
 
           // 👉 основной момент — snap логика
           onDragEnd={(e, info) => {
             const offset = info.offset.x
             const velocity = info.velocity.x
 
-            // свайп влево → следующий
-            if (offset < -100 || velocity < -500) {
+            if (offset < -80 || velocity < -500) {
               next()
-            }
-            // свайп вправо → предыдущий
-            else if (offset > 100 || velocity > 500) {
+            } else if (offset > 80 || velocity > 500) {
               prev()
             }
           }}
 
           // 👉 анимации входа/выхода
-          initial={{ x: 300, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: -300, opacity: 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          transition={{
+            type: 'spring',
+            stiffness: 250,
+            damping: 30,
+          }}
         >
           <img
             src={currentMeme.previewUrl}
@@ -160,14 +154,14 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
           {/* стрелки */}
           <button
             onClick={prev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-2xl"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-2xl p-4 bg-black rounded-full cursor-pointer"
           >
             ←
           </button>
 
           <button
             onClick={next}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-2xl"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-2xl  p-4 bg-black rounded-full cursor-pointer"
           >
             →
           </button>

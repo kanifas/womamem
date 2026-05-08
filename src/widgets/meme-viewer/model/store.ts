@@ -4,9 +4,8 @@ import { create } from 'zustand'
 
 type Store = {
   memes: TMeme[]
-  _currentIndex: number
-  _nextIndex: number
-  _prevIndex: number
+  currentIndex: number
+  direction: 1 | -1
   setMemes: (memes: TMeme[]) => void
   openBySlug: (slug: string) => void
   next: () => void
@@ -19,86 +18,53 @@ type Store = {
 export const useMemeViewerStore = create<Store>((set, get) => ({
   memes: [],
 
-  _currentIndex: 0,
-  _nextIndex: 0,
-  _prevIndex: 0,
+  currentIndex: 0,
+  direction: 1,
 
   setMemes: (memes) => {
-    if (memes.length === 0) {
-      return
-    }
-
-    if (memes.length == 1) {
-      set({
-        memes,
-        _currentIndex: 0,
-        _nextIndex: 0,
-        _prevIndex: 0,
-      })
-    } else {
-      set({
-        memes,
-        _currentIndex: 0,
-        _nextIndex: 1,
-        _prevIndex: memes.length - 1,
-      })
-    }
+    set({memes})
   },
 
   next: () => {
-    const { _currentIndex, _nextIndex, memes } = get()
-    if (memes.length < 2) {
-      set({
-        _currentIndex: 0,
-        _nextIndex: 0,
-        _prevIndex: 0
-      })
-    } else {
-      set({
-        _currentIndex: memes[_currentIndex + 1] ? _currentIndex + 1 : 0,
-        _nextIndex: memes[_nextIndex + 1] ? _nextIndex + 1 : 0,
-        _prevIndex: _currentIndex
-      })
-    }
+    const { currentIndex, memes } = get()
+    const nextIndex = (currentIndex + 1) % memes.length
+    set({
+      currentIndex: nextIndex,
+      direction: 1,
+    })
   },
 
   prev: () => {
-    const { _currentIndex, _prevIndex, memes } = get()
-    if (memes.length < 2) {
-      set({
-        _currentIndex: 0,
-        _nextIndex: 0,
-        _prevIndex: 0
-      })
-    } else {
-      set({
-        _currentIndex: memes[_currentIndex - 1] ? _currentIndex - 1 : memes.length -1,
-        _nextIndex: _currentIndex,
-        _prevIndex: memes[_prevIndex - 1] ? _prevIndex - 1 : memes.length -1
-      })
-    }
+    const { currentIndex, memes } = get()
+    const prevIndex =
+      (currentIndex - 1 + memes.length) % memes.length
+
+    set({
+      currentIndex: prevIndex,
+      direction: -1,
+    })
   },
 
   getCurrentMem: () => {
-    const { _currentIndex, memes } = get()
-    return memes[_currentIndex]
+    const { currentIndex, memes } = get()
+    return memes[currentIndex]
   },
 
   getNextMem: () => {
-    const { _nextIndex, memes } = get()
-    return memes[_nextIndex]
+    const { currentIndex, memes } = get()
+    return memes[currentIndex + 1] ? memes[currentIndex + 1] : memes[0]
   },
 
   getPrevMem: () => {
-    const { _prevIndex, memes } = get()
-    return memes[_prevIndex]
+    const { currentIndex, memes } = get()
+    return memes[currentIndex - 1] ? memes[currentIndex - 1] : memes[memes.length - 1]
   },
 
   openBySlug: (slug) => {
     const { memes } = get()
     const index = memes.findIndex((m) => m.slug === slug)
     if (index !== -1) {
-      set({ _currentIndex: index })
+      set({ currentIndex: index })
     }
   },
 }))
