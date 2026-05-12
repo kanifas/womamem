@@ -21,11 +21,13 @@ export const memes = pgTable(
 
     title: text('title').notNull(),
 
-    slug: text('slug').notNull(),
-
     description: text('description'),
 
+    slug: text('slug').notNull(),
+
     previewUrl: text('preview_url'),
+
+    previewVariantId: uuid('preview_variant_id'),
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
 

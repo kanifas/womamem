@@ -9,7 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.2.2",
+    "@aws-sdk/client-s3": "^3.1045.0",
     "@tanstack/react-query": "^5.100.9",
+    "antd": "^6.3.7",
     "drizzle-orm": "^0.45.2",
     "framer-motion": "^12.38.0",
     "next": "16.2.4",

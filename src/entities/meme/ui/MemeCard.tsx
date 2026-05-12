@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { LikeButton } from '@/features'
 import { FavoriteButton } from '@/features'
 import { TMeme } from '@/entities'
@@ -11,6 +11,15 @@ type TProps = {
 }
 
 export const MemeCard: FC<TProps> = ({ meme }) => {
+  const [activeVariantIndex, setActiveVariantIndex] = useState(0)
+
+  const activeVariant = meme.variants[activeVariantIndex]
+
+  // На первое время:
+  const imageUrl = activeVariant?.fileUrl ?? meme.previewUrl
+
+
+
   return (
     
       <Link
@@ -29,7 +38,7 @@ export const MemeCard: FC<TProps> = ({ meme }) => {
         {/* preview */}
         <div className="relative">
           <img
-            src={meme.previewUrl}
+            src={imageUrl}
             alt={meme.title}
             className="
               w-full
@@ -42,6 +51,57 @@ export const MemeCard: FC<TProps> = ({ meme }) => {
             loading="lazy"
           />
         </div>
+
+        {meme.variants.length > 0 && (
+          <div
+            className="
+              mt-2
+              flex
+              gap-2
+              overflow-x-auto
+              scrollbar-none
+              snap-x
+              px-2
+            "
+          >
+            {meme.variants.map(
+              (variant, index) => (
+                <button
+                  key={variant.id}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setActiveVariantIndex(index)
+                  }}
+                  className={`
+                    relative
+                    h-14
+                    w-14
+                    shrink-0
+                    overflow-hidden
+                    rounded-lg
+                    border-2
+                    transition
+                    ${
+                      activeVariantIndex === index
+                        ? 'scale-105 border-white'
+                        : 'opacity-70 border-transparent'
+                    }
+                  `}
+                >
+                  <img
+                    src={variant.thumbnailUrl ?? variant.fileUrl}
+                    className="
+                      h-full
+                      w-full
+                      object-cover
+                    "
+                    draggable={false}
+                  />
+                </button>
+              ),
+            )}
+          </div>
+        )}
 
         {/* content */}
         <div className="p-3">
