@@ -60,25 +60,21 @@ const App: FC = () => {
             </Col>
 
             <Col xs={24} sm={12} lg={6}>
-              <Card bordered={false} hoverable>
-                <Statistic
-                  title="Новые заказы"
-                  value={93}
-                  valueStyle={{ color: '#cf1322' }}
-                  prefix={<ShoppingCartOutlined />}
-                  suffix={<ArrowDownOutlined />}
-                />
-              </Card>
+              <Link href="/admin/create">
+                <Card title="Other..." variant="outlined" hoverable style={{textAlign: 'center'}}>
+
+                </Card>
+              </Link>
             </Col>
 
             <Col xs={24} sm={12} lg={6}>
-              <Card bordered={false} hoverable>
+              <Card variant='borderless' hoverable>
                 <Statistic title="Конверсия" value={11.28} precision={2} suffix="%" />
               </Card>
             </Col>
 
             <Col xs={24} sm={12} lg={6}>
-              <Card bordered={false} hoverable>
+              <Card variant='borderless' hoverable>
                 <Statistic title="Выручка (₽)" value={542100} precision={0} />
               </Card>
             </Col>

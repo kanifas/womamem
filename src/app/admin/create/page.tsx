@@ -1,65 +1,105 @@
 'use client'
 
-import { FC, ReactNode, useState } from 'react';
-import Link from 'next/link';
-import { Layout, theme } from 'antd';
-import { Button, Flex, Splitter, Switch, Typography, Input, Checkbox, Form } from 'antd';
-import type { FormProps } from 'antd';
+import Link from 'next/link'
+import { FC, ReactNode, useState } from 'react'
+import { Layout, theme } from 'antd'
+import {
+  Button,
+  Flex,
+  Splitter,
+  Input,
+  Form
+} from 'antd'
+import type { FormProps } from 'antd'
 
-import { InboxOutlined } from '@ant-design/icons';
-import type { UploadProps } from 'antd';
-import { message, Upload } from 'antd';
+import { InboxOutlined } from '@ant-design/icons'
+import { message, Upload } from 'antd'
+import type { UploadProps } from 'antd'
 
-const { Dragger } = Upload;
-const { Header, Content } = Layout;
+const { Dragger } = Upload
+const { Header, Content } = Layout
+
+import { MemeVariantType } from '@/entities'
+import { createMemeAction } from '@/features'
 
 type FieldType = {
-  title?: string;
-  description?: string;
-  slug?: string;
+  title?: string
+  description?: string
+  slug?: string
 };
 
 type VariantDraft = {
   id: string
-  file?: File
+  file: File
   previewUrl: string
-  type: string
+  type: MemeVariantType
 }
-
-const props: UploadProps = {
-  name: 'file',
-  multiple: false,
-  accept: 'image/*',
-  action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
-  onChange(info) {
-    const { status } = info.file;
-    if (status !== 'uploading') {
-      console.log(info.file, info.fileList);
-    }
-    if (status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully.`);
-    } else if (status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-  onDrop(e) {
-    console.log('Dropped files', e.dataTransfer.files);
-  },
-};
-
-const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-  console.log('Success:', values);
-};
-
-const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-  console.log('Failed:', errorInfo);
-};
 
 const App: FC = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
-  const [sizes, setSizes] = useState<(number | string)[]>(['50%', '50%']);
+  const [sizes, setSizes] = useState<(number | string)[]>(['50%', '50%'])
+  const [variants, setVariants] = useState<VariantDraft[]>([])
+  const [form] = Form.useForm();
+
+  const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+    const result = await createMemeAction({
+      title: values.title!,
+      slug: values.slug!,
+      description: values.description,
+
+      variants: variants.map((item) => ({
+        file: item.file,
+        type: item.type,
+      })),
+    })
+    if (result.success) {
+      setVariants([])
+      form.resetFields()
+    }
+  }
+
+  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
+    console.log('Failed:', errorInfo)
+  }
+
+  const uploadProps: UploadProps = {
+    multiple: true,
+    accept: 'image/*',
+    name: 'file',
+    showUploadList: false,
+    // action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
+    // onChange(info) {
+    //   const { status } = info.file;
+    //   if (status !== 'uploading') {
+    //     console.log(info.file, info.fileList)
+    //   }
+    //   if (status === 'done') {
+    //     message.success(`${info.file.name} file uploaded successfully.`)
+    //   } else if (status === 'error') {
+    //     message.error(`${info.file.name} file upload failed.`);
+    //   }
+    // },
+    beforeUpload(file) {
+      const previewUrl = URL.createObjectURL(file)
+
+      setVariants((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          file,
+          previewUrl,
+          type: 'image',
+        },
+      ])
+
+      return false; // отключает auto-upload Ant Design. это ОЧЕНЬ важно
+    },
+    onDrop(e) {
+      console.log('Dropped files', e.dataTransfer.files)
+    },
+  }
 
   return (
     <Layout>
@@ -81,7 +121,7 @@ const App: FC = () => {
               style={{ boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}
             >
               <Splitter.Panel size={sizes[0]} resizable={false}>
-                  <Dragger {...props}>
+                  <Dragger {...uploadProps} style={{ maxHeight: 300 }}>
                     <p className="ant-upload-drag-icon">
                       <InboxOutlined />
                     </p>
@@ -91,10 +131,71 @@ const App: FC = () => {
                       banned files.
                     </p>
                   </Dragger>
+
+                  <div className="mt-6 grid grid-cols-2 gap-4">
+                    {variants.map((variant) => (
+                      <div
+                        key={variant.id}
+                        className="
+                          rounded-xl
+                          border
+                          border-zinc-800
+                          overflow-hidden
+                        "
+                      >
+                        <img
+                          src={variant.previewUrl}
+                          className="
+                            aspect-[9/16]
+                            w-full
+                            object-cover
+                          "
+                        />
+
+                        <div className="p-3">
+                          <select
+                            value={variant.type}
+                            onChange={(e) => {
+                              setVariants((prev) =>
+                                prev.map((v) =>
+                                  v.id === variant.id
+                                    ? {
+                                        ...v,
+                                        type: e.target
+                                          .value as MemeVariantType,
+                                      }
+                                    : v,
+                                ),
+                              )
+                            }}
+                          >
+                            <option value="image">
+                              image
+                            </option>
+
+                            <option value="sketch">
+                              sketch
+                            </option>
+
+                            <option value="pixel">
+                              pixel
+                            </option>
+
+                            <option value="gif">
+                              gif
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
               </Splitter.Panel>
+
+
               <Splitter.Panel size={sizes[1]}>
                 <Form
                   name="basic"
+                  form={form}
                   labelCol={{ span: 8 }}
                   wrapperCol={{ span: 16 }}
                   style={{ padding: 20 }}

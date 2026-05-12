@@ -5,6 +5,8 @@ import { create } from 'zustand'
 type Store = {
   memes: TMeme[]
   currentIndex: number
+  currentVariantIndex: number
+  setVariantIndex: (index: number) => void
   direction: 1 | -1
   setMemes: (memes: TMeme[]) => void
   openBySlug: (slug: string) => void
@@ -17,9 +19,11 @@ type Store = {
 
 export const useMemeViewerStore = create<Store>((set, get) => ({
   memes: [],
-
   currentIndex: 0,
+  currentVariantIndex: 0,
   direction: 1,
+
+  setVariantIndex: () => {},
 
   setMemes: (memes) => {
     set({memes})

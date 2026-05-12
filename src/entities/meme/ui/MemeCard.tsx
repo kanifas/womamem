@@ -21,7 +21,6 @@ export const MemeCard: FC<TProps> = ({ meme }) => {
 
 
   return (
-    
       <Link
         href={`/meme/${meme.slug}`}
         scroll={false}

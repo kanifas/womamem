@@ -1,17 +1,18 @@
 import { desc, eq } from 'drizzle-orm'
 
 import { db } from '@/shared/lib/db'
-import { memes } from '@/db/schema/meme'
+import { meme } from '@/db/schema/meme'
 
 export const getMemes = async () => {
-  const result = await db.query.memes.findMany({
-    where: eq(memes.isActive, true),
+  const result = await db.query.meme.findMany({
+    where: eq(meme.isActive, true),
 
     orderBy: (m, { desc }) => [
       desc(m.createdAt),
     ],
 
     with: {
+      // variants: true,
       variants: {
         orderBy: (v, { asc }) => [
           asc(v.sortOrder),

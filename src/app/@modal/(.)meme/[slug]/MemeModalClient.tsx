@@ -71,14 +71,14 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
     const nextMeme = getNextMem()
     const prevMeme = getPrevMem()
 
-    if (nextMeme?.previewUrl) {
+    if (nextMeme.variants[0]?.fileUrl) {
       const img = new Image()
-      img.src = nextMeme.previewUrl
+      img.src = nextMeme.variants[0]?.fileUrl
     }
 
-    if (prevMeme?.previewUrl) {
+    if (prevMeme.variants[0]?.fileUrl) {
       const img = new Image()
-      img.src = prevMeme.previewUrl
+      img.src = prevMeme.variants[0]?.fileUrl
     }
   }, [currentMeme, getNextMem, getPrevMem])
 
@@ -146,7 +146,8 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
           }}
         >
           <img
-            src={currentMeme.previewUrl}
+            src={currentMeme.variants[0]?.fileUrl ??
+  currentMeme.previewUrl}
             className="max-h-[90vh] max-w-[90vw] object-contain select-none pointer-events-none"
             draggable={false}
           />

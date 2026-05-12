@@ -2,7 +2,7 @@ import { pgTable, primaryKey, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { user } from './user';
 import { meme } from './meme';
 
-export const favorites = pgTable('favorite', {
+export const favorite = pgTable('favorite', {
   userId: uuid('user_id').references(() => user.id),
   memeId: uuid('meme_id').references(() => meme.id),
 
