@@ -1,7 +1,7 @@
 import { desc, eq } from 'drizzle-orm'
 
 import { db } from '@/shared/lib/db'
-import { memes } from '@/db/schema/memes'
+import { memes } from '@/db/schema/meme'
 
 export const getMemes = async () => {
   const result = await db.query.memes.findMany({

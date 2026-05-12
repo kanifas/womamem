@@ -24,8 +24,6 @@ const App: FC = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const currentYear = new Date().getFullYear();
-
   return (
     <Layout>
       <Header style={{ display: 'flex', alignItems: 'center' }}>

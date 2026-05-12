@@ -6,14 +6,14 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 
-import { memes } from './memes'
+import { meme } from './meme'
 
 export const memeVariant = pgTable('meme_variant', {
   id: uuid('id').defaultRandom().primaryKey(),
 
   memeId: uuid('meme_id')
     .notNull()
-    .references(() => memes.id, {
+    .references(() => meme.id, {
       onDelete: 'cascade',
     }),
 

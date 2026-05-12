@@ -14,7 +14,7 @@ import {
 
 // ---- TABLE ----
 
-export const memes = pgTable(
+export const meme = pgTable(
   'meme',
   {
     id: uuid('id').defaultRandom().primaryKey(),

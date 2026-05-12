@@ -1,12 +1,12 @@
 import { pgTable, text, integer, timestamp, uuid } from 'drizzle-orm/pg-core';
-import { users } from './users';
-import { memes } from './memes';
+import { user } from './user';
+import { meme } from './meme';
 
-export const comments = pgTable('comment', {
+export const comment = pgTable('comment', {
   id: uuid('id').defaultRandom().primaryKey(),
 
-  memeId: uuid('meme_id').references(() => memes.id),
-  userId: uuid('user_id').references(() => users.id),
+  memeId: uuid('meme_id').references(() => meme.id),
+  userId: uuid('user_id').references(() => user.id),
 
   parentId: uuid('parent_id'),
 

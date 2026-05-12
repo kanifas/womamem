@@ -1,10 +1,10 @@
 import { relations } from 'drizzle-orm'
 
-import { memes } from './memes'
+import { meme } from './meme'
 import { memeVariant } from './memeVariant'
 
 export const memeRelations = relations(
-  memes,
+  meme,
   ({ many }) => ({
     variants: many(memeVariant),
   }),
@@ -12,8 +12,8 @@ export const memeRelations = relations(
 
 export const memeVariantRelations =
   relations(memeVariant, ({ one }) => ({
-    meme: one(memes, {
+    meme: one(meme, {
       fields: [memeVariant.memeId],
-      references: [memes.id],
+      references: [meme.id],
     }),
   }))

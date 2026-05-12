@@ -19,6 +19,13 @@ type FieldType = {
   slug?: string;
 };
 
+type VariantDraft = {
+  id: string
+  file?: File
+  previewUrl: string
+  type: string
+}
+
 const props: UploadProps = {
   name: 'file',
   multiple: false,
