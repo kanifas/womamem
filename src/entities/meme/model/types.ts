@@ -19,6 +19,7 @@ export type MemeVariantStyle =
   | 'original'
   | 'sketch'
   | 'pixel'
+  | 'vector'
   | 'animated'
   | 'sticker'
 
@@ -32,7 +33,7 @@ export type MemeVariantFormat =
 export type MemeVariantRole =
   | 'content'
   | 'preview'
-  | 'sticker'
+  | 'thumbnail'
 
 export type MemeVariant = {
   id: string

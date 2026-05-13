@@ -93,11 +93,7 @@ export const AdminVariantCard: FC<Props> = ({
       </button>
 
       {/* content */}
-
       <MediaRenderer
-        muted
-        autoPlay
-        loop
         playsInline
         src={variant.fileUrl}
         format={variant.format}

@@ -19,8 +19,8 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
   const openBySlug = useMemeViewerStore((s) => s.openBySlug)
   const verticalDirection = useMemeViewerStore((s) => s.verticalDirection)
   const horizontalDirection = useMemeViewerStore((s) => s.horizontalDirection)
-  const currentMemeIndex = useMemeViewerStore((s) => s.currentMemeIndex)
-  const currentVariantIndex = useMemeViewerStore((s) => s.currentVariantIndex)
+  const memeIndex = useMemeViewerStore((s) => s.memeIndex)
+  const variantIndex = useMemeViewerStore((s) => s.variantIndex)
   const getCurrentMeme = useMemeViewerStore((s) => s.getCurrentMeme)
   const getCurrentVariant = useMemeViewerStore((s) => s.getCurrentVariant)
   const nextMeme = useMemeViewerStore((s) => s.nextMeme)
@@ -114,7 +114,7 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
     >
       <AnimatePresence initial={false} custom={verticalDirection} mode='wait'>
         <motion.div
-          key={currentMemeIndex}
+          key={memeIndex}
           className="relative"
           onClick={(e) => e.stopPropagation()}
 
@@ -126,7 +126,6 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
           exit="exit"
           dragMomentum={false}
           drag
-          dragConstraints={{ left: 0, right: 0 }}
 
           // 👉 инерция + “резиновость”
           dragElastic={0.3}
@@ -143,33 +142,23 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
             const velocityY = info.velocity.y
 
             const isHorizontal = Math.abs(offsetX) > Math.abs(offsetY)
-
             if (isHorizontal) {
-              if (
-                offsetX < -80 ||
-                velocityX < -500
-              ) {
+              if (offsetX < -80 || velocityX < -500) {
                 nextVariant()
               }
 
-              else if (
-                offsetX > 80 ||
-                velocityX > 500
-              ) {
+              else if (offsetX > 80 || velocityX > 500) {
                 prevVariant()
               }
-            } else {
-              if (
-                offsetY < -80 ||
-                velocityY < -500
-              ) {
-                nextMeme()
-              }
 
-              else if (
-                offsetY > 80 ||
-                velocityY > 500
-              ) {
+              return
+            }
+
+            const isVertical = Math.abs(offsetY) > Math.abs(offsetX)
+            if (isVertical){
+              if (offsetY < -100 || velocityY < -600) {
+                nextMeme()
+              } else if (offsetY > 100 || velocityY > 600) {
                 prevMeme()
               }
             }

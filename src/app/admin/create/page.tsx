@@ -65,21 +65,14 @@ const App: FC = () => {
     if (!files) return
 
     const next = Array.from(files).map(
-      (file, index) => ({
+      (file, index): VariantDraft => ({
         id: crypto.randomUUID(),
-
         file,
-
         fileUrl: URL.createObjectURL(file),
-
         format: getFileFormat(file),
-
         style: 'original',
-
         role: 'content',
-
-        sortOrder:
-          variants.length + index,
+        sortOrder: variants.length + index,
       }),
     )
 

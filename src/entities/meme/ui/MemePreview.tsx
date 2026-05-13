@@ -13,7 +13,7 @@ export const MemePreview: FC<Props> = ({
 }) => {
   return (
     <MediaRenderer
-      src={variant.thumbnailUrl ?? variant.fileUrl}
+      src={variant.fileUrl}
       format={variant.format}
       className="
         w-full

@@ -6,8 +6,9 @@ import { TMeme } from '@/entities'
 type Store = {
   memes: TMeme[]
 
-  currentMemeIndex: number
-  currentVariantIndex: number
+  memeIndex: number
+  variantIndex: number
+  setVariantIndex: (index: number) => void
 
   verticalDirection: 1 | -1
   horizontalDirection: 1 | -1
@@ -31,8 +32,9 @@ type Store = {
 export const useMemeViewerStore = create<Store>((set, get) => ({
   memes: [],
 
-  currentMemeIndex: 0,
-  currentVariantIndex: 0,
+  memeIndex: 0,
+  variantIndex: 0,
+  setVariantIndex: (index) => set({ variantIndex: index }),
 
   verticalDirection: 1,
   horizontalDirection: 1,
@@ -46,95 +48,60 @@ export const useMemeViewerStore = create<Store>((set, get) => ({
     const index = memes.findIndex((m) => m.slug === slug)
     if (index !== -1) {
       set({
-        currentMemeIndex: index,
-        currentVariantIndex: 0,
+        memeIndex: index,
+        variantIndex: 0,
       })
     }
   },
 
   nextMeme: () => {
-    const { currentMemeIndex, memes } = get()
-    const nextIndex = (currentMemeIndex + 1) % memes.length
+    const { memeIndex, memes } = get()
+    const nextIndex = (memeIndex + 1) % memes.length
     set({
-      currentMemeIndex: nextIndex,
-      currentVariantIndex: 0,
+      memeIndex: nextIndex,
+      variantIndex: 0,
       verticalDirection: 1,
     })
   },
 
   prevMeme: () => {
-    const { currentMemeIndex, memes } = get()
-    const prevIndex = (currentMemeIndex - 1 + memes.length) % memes.length
+    const { memeIndex, memes } = get()
+    const prevIndex = (memeIndex - 1 + memes.length) % memes.length
     set({
-      currentMemeIndex: prevIndex,
-      currentVariantIndex: 0,
+      memeIndex: prevIndex,
+      variantIndex: 0,
       verticalDirection: -1,
     })
   },
 
   nextVariant: () => {
-    const { currentVariantIndex, currentMemeIndex, memes } = get()
-    const variants = memes[currentMemeIndex]?.variants ?? []
-
-    if (!variants.length) return
-
-    const nextIndex = (currentVariantIndex + 1) % variants.length
-
-    set({
-      currentVariantIndex: nextIndex,
-      horizontalDirection: 1,
-    })
+    const {variantIndex, getCurrentMeme } = get()
+    const meme = getCurrentMeme()
+    const next = (variantIndex + 1) % meme.variants.length
+    set({ variantIndex: next })
   },
 
   prevVariant: () => {
-    const { currentVariantIndex, currentMemeIndex, memes } = get()
-    const variants = memes[currentMemeIndex]?.variants ?? []
-
-    if (!variants.length) return
-
-    const prevIndex = (currentVariantIndex - 1 + variants.length) % variants.length
-
-    set({
-      currentVariantIndex: prevIndex,
-      horizontalDirection: -1,
-    })
+    const { variantIndex, getCurrentMeme } = get()
+    const meme = getCurrentMeme()
+    const prev = (variantIndex - 1 + meme.variants.length) % meme.variants.length
+    set({ variantIndex: prev})
   },
 
   setVariant: (index) => {
     set({
-      currentVariantIndex: index,
+      variantIndex: index,
     })
   },
 
   getCurrentMeme: () => {
-    const { currentMemeIndex, memes } = get()
-    return memes[currentMemeIndex]
+    const { memeIndex, memes } = get()
+    return memes[memeIndex]
   },
 
   getCurrentVariant: () => {
-    const { currentMemeIndex, currentVariantIndex, memes } = get()
-    return memes[currentMemeIndex]?.variants[currentVariantIndex]
+    const { getCurrentMeme, variantIndex } = get()
+    const currentMeme = getCurrentMeme()
+    return currentMeme.variants[variantIndex]
   },
-
-  // toNextMeme: () => {
-  //   const { currentMemeIndex, memes } = get()
-  //   const nextIndex = (currentMemeIndex + 1) % memes.length
-  //   set({
-  //     currentMemeIndex: nextIndex,
-  //     direction: 1,
-  //     currentVariantIndex: 0,
-  //   })
-  // },
-
-  // toPrevMeme: () => {
-  //   const { currentMemeIndex, memes } = get()
-  //   const prevIndex =
-  //     (currentMemeIndex - 1 + memes.length) % memes.length
-
-  //   set({
-  //     currentMemeIndex: prevIndex,
-  //     direction: -1,
-  //     currentVariantIndex: 0,
-  //   })
-  // },
 }))

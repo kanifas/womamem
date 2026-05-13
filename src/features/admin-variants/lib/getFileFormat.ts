@@ -1,6 +1,6 @@
-export const getFileFormat = (
-  file: File,
-) => {
+import { MemeVariantFormat } from '@/entities';
+
+export const getFileFormat = (file: File): MemeVariantFormat => {
   const type = file.type
 
   if (type.startsWith('video/')) {
@@ -19,6 +19,5 @@ export const getFileFormat = (
     return 'apng'
   }
 
-  return type
-  // return 'image'
+  return 'image'
 }

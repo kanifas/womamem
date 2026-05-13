@@ -6,6 +6,7 @@ import { LikeButton } from '@/features'
 import { FavoriteButton } from '@/features'
 import { TMeme } from '@/entities'
 import { MemePreview } from './MemePreview'
+import { MediaRenderer } from '@/shared/ui/media/MediaRenderer'
 
 type TProps = {
   meme: TMeme
@@ -72,16 +73,15 @@ export const MemeCard: FC<TProps> = ({ meme }) => {
                     }
                   `}
                 >
-                  <img
-                    src={variant.thumbnailUrl ?? variant.fileUrl}
+                  <MediaRenderer
+                    src={variant.fileUrl}
+                    format={variant.format}
                     className="
                       h-full
                       w-full
                       object-cover
                     "
-                    draggable={false}
                   />
-
                 </button>
               ),
             )}
