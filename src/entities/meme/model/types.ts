@@ -3,8 +3,7 @@ export type Meme = {
   title: string
   description?: string
   slug: string
-  previewUrl?: string
-  previewVariantId?: string
+
   createdAt: Date
 
   viewsCount: number
@@ -16,20 +15,31 @@ export type Meme = {
   variants: MemeVariant[]
 }
 
-export const memeVariantTypes = [
-  'image',
-  'video',
-  'sketch',
-  'pixel',
-  'gif',
-] as const
+export type MemeVariantStyle =
+  | 'original'
+  | 'sketch'
+  | 'pixel'
+  | 'animated'
+  | 'sticker'
 
-export type MemeVariantType = (typeof memeVariantTypes)[number]
+export type MemeVariantFormat =
+  | 'image'
+  | 'video'
+  | 'gif'
+  | 'webp'
+  | 'apng'
+
+export type MemeVariantRole =
+  | 'content'
+  | 'preview'
+  | 'sticker'
 
 export type MemeVariant = {
   id: string
   memeId: string
-  type: MemeVariantType
+  style: MemeVariantStyle
+  format: MemeVariantFormat
+  role: MemeVariantRole
   fileUrl: string
   thumbnailUrl?: string
   width?: number

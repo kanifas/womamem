@@ -5,6 +5,7 @@ import { FC, useState } from 'react'
 import { LikeButton } from '@/features'
 import { FavoriteButton } from '@/features'
 import { TMeme } from '@/entities'
+import { MemePreview } from './MemePreview'
 
 type TProps = {
   meme: TMeme
@@ -12,13 +13,7 @@ type TProps = {
 
 export const MemeCard: FC<TProps> = ({ meme }) => {
   const [activeVariantIndex, setActiveVariantIndex] = useState(0)
-
   const activeVariant = meme.variants[activeVariantIndex]
-
-  // На первое время:
-  const imageUrl = activeVariant?.fileUrl ?? meme.previewUrl
-
-
 
   return (
       <Link
@@ -36,18 +31,8 @@ export const MemeCard: FC<TProps> = ({ meme }) => {
       >
         {/* preview */}
         <div className="relative">
-          <img
-            src={imageUrl}
-            alt={meme.title}
-            className="
-              w-full
-              object-cover
-              transition-transform
-              duration-300
-              group-hover:scale-[1.02]
-            "
-            draggable={false}
-            loading="lazy"
+          <MemePreview
+            variant={activeVariant}
           />
         </div>
 
@@ -96,6 +81,7 @@ export const MemeCard: FC<TProps> = ({ meme }) => {
                     "
                     draggable={false}
                   />
+
                 </button>
               ),
             )}

@@ -1,39 +1,31 @@
 'use client'
 
-import Link from 'next/link'
-import { FC, ReactNode, useState } from 'react'
+import { FC, useState } from 'react'
 import { Layout, theme } from 'antd'
 import {
   Button,
   Flex,
   Splitter,
   Input,
-  Form
+  Form,
 } from 'antd'
 import type { FormProps } from 'antd'
 
-import { InboxOutlined } from '@ant-design/icons'
-import { message, Upload } from 'antd'
-import type { UploadProps } from 'antd'
-
-const { Dragger } = Upload
 const { Header, Content } = Layout
 
-import { MemeVariantType } from '@/entities'
-import { createMemeAction } from '@/features'
+import type { MemeVariantStyle, MemeVariantFormat, MemeVariantRole } from '@/entities'
+import {
+  AdminVariantManager,
+  createMemeAction,
+  getFileFormat,
+  type VariantDraft
+} from '@/features'
 
 type FieldType = {
   title?: string
   description?: string
   slug?: string
 };
-
-type VariantDraft = {
-  id: string
-  file: File
-  previewUrl: string
-  type: MemeVariantType
-}
 
 const App: FC = () => {
   const {
@@ -48,11 +40,14 @@ const App: FC = () => {
       title: values.title!,
       slug: values.slug!,
       description: values.description,
-
-      variants: variants.map((item) => ({
-        file: item.file,
-        type: item.type,
-      })),
+      variants: variants
+        .filter((item) => item.file)
+        .map((item) => ({
+          file: item.file as File,
+          style: item.style,
+          format: item.format,
+          role: item.role,
+        })),
     })
     if (result.success) {
       setVariants([])
@@ -64,41 +59,34 @@ const App: FC = () => {
     console.log('Failed:', errorInfo)
   }
 
-  const uploadProps: UploadProps = {
-    multiple: true,
-    accept: 'image/*',
-    name: 'file',
-    showUploadList: false,
-    // action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
-    // onChange(info) {
-    //   const { status } = info.file;
-    //   if (status !== 'uploading') {
-    //     console.log(info.file, info.fileList)
-    //   }
-    //   if (status === 'done') {
-    //     message.success(`${info.file.name} file uploaded successfully.`)
-    //   } else if (status === 'error') {
-    //     message.error(`${info.file.name} file upload failed.`);
-    //   }
-    // },
-    beforeUpload(file) {
-      const previewUrl = URL.createObjectURL(file)
+  const onFiles = (
+    files: FileList | null,
+  ) => {
+    if (!files) return
 
-      setVariants((prev) => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          file,
-          previewUrl,
-          type: 'image',
-        },
-      ])
+    const next = Array.from(files).map(
+      (file, index) => ({
+        id: crypto.randomUUID(),
 
-      return false; // отключает auto-upload Ant Design. это ОЧЕНЬ важно
-    },
-    onDrop(e) {
-      console.log('Dropped files', e.dataTransfer.files)
-    },
+        file,
+
+        fileUrl: URL.createObjectURL(file),
+
+        format: getFileFormat(file),
+
+        style: 'original',
+
+        role: 'content',
+
+        sortOrder:
+          variants.length + index,
+      }),
+    )
+
+    setVariants((prev) => [
+      ...prev,
+      ...next,
+    ])
   }
 
   return (
@@ -121,74 +109,44 @@ const App: FC = () => {
               style={{ boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}
             >
               <Splitter.Panel size={sizes[0]} resizable={false}>
-                  <Dragger {...uploadProps} style={{ maxHeight: 300 }}>
-                    <p className="ant-upload-drag-icon">
-                      <InboxOutlined />
-                    </p>
-                    <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                    <p className="ant-upload-hint">
-                      Support for a single or bulk upload. Strictly prohibited from uploading company data or other
-                      banned files.
-                    </p>
-                  </Dragger>
+                  <label
+                    className="
+                      flex
+                      min-h-[220px]
+                      cursor-pointer
+                      items-center
+                      justify-center
+                      rounded-2xl
+                      border-2
+                      border-dashed
+                      border-zinc-700
+                      bg-zinc-900
+                      p-10
+                      text-zinc-400
+                    "
+                  >
+                    <input
+                      type="file"
+                      multiple
+                      hidden
+                      accept="
+                        image/*,
+                        video/*,
+                        .gif,
+                        .webp
+                      "
+                      onChange={(e) =>
+                        onFiles(e.target.files)
+                      }
+                    />
 
-                  <div className="mt-6 grid grid-cols-2 gap-4">
-                    {variants.map((variant) => (
-                      <div
-                        key={variant.id}
-                        className="
-                          rounded-xl
-                          border
-                          border-zinc-800
-                          overflow-hidden
-                        "
-                      >
-                        <img
-                          src={variant.previewUrl}
-                          className="
-                            aspect-[9/16]
-                            w-full
-                            object-cover
-                          "
-                        />
+                    Upload variants
+                  </label>
 
-                        <div className="p-3">
-                          <select
-                            value={variant.type}
-                            onChange={(e) => {
-                              setVariants((prev) =>
-                                prev.map((v) =>
-                                  v.id === variant.id
-                                    ? {
-                                        ...v,
-                                        type: e.target
-                                          .value as MemeVariantType,
-                                      }
-                                    : v,
-                                ),
-                              )
-                            }}
-                          >
-                            <option value="image">
-                              image
-                            </option>
-
-                            <option value="sketch">
-                              sketch
-                            </option>
-
-                            <option value="pixel">
-                              pixel
-                            </option>
-
-                            <option value="gif">
-                              gif
-                            </option>
-                          </select>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <AdminVariantManager
+                    variants={variants}
+                    setVariants={setVariants}
+                  />
               </Splitter.Panel>
 
 

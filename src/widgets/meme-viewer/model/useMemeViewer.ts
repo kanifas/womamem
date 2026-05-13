@@ -1,7 +1,9 @@
 import { TMeme } from '@/entities'
 
 type UseMemeViewer = {
-  currentIndex: number
+  currentMemeIndex: number
+  currentVariantIndex: number
+
   memes: TMeme[]
 
   next: () => void

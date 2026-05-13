@@ -1,10 +1,11 @@
 'use client'
 
-import { FC, useEffect, useRef } from 'react'
+import { FC, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useMemeViewerStore } from '@/widgets/meme-viewer/model/store'
 import { TMeme } from '@/entities'
+import { MemeVariantStrip, MemeVariantContent } from '@/widgets'
 
 type Props = {
   initialSlug: string
@@ -16,13 +17,16 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
   // const { memes: storeMemes } = useMemeViewerStore((s) => s.memes)
   const setMemes = useMemeViewerStore((s) => s.setMemes)
   const openBySlug = useMemeViewerStore((s) => s.openBySlug)
-  const currentIndex = useMemeViewerStore((s) => s.currentIndex)
-  const getCurrentMem = useMemeViewerStore((s) => s.getCurrentMem)
-  const getNextMem = useMemeViewerStore((s) => s.getNextMem)
-  const getPrevMem = useMemeViewerStore((s) => s.getPrevMem)
-  const direction = useMemeViewerStore((s) => s.direction)
-  const next = useMemeViewerStore((s) => s.next)
-  const prev = useMemeViewerStore((s) => s.prev)
+  const verticalDirection = useMemeViewerStore((s) => s.verticalDirection)
+  const horizontalDirection = useMemeViewerStore((s) => s.horizontalDirection)
+  const currentMemeIndex = useMemeViewerStore((s) => s.currentMemeIndex)
+  const currentVariantIndex = useMemeViewerStore((s) => s.currentVariantIndex)
+  const getCurrentMeme = useMemeViewerStore((s) => s.getCurrentMeme)
+  const getCurrentVariant = useMemeViewerStore((s) => s.getCurrentVariant)
+  const nextMeme = useMemeViewerStore((s) => s.nextMeme)
+  const prevMeme = useMemeViewerStore((s) => s.prevMeme)
+  const nextVariant = useMemeViewerStore((s) => s.nextVariant)
+  const prevVariant = useMemeViewerStore((s) => s.prevVariant)
 
   useEffect(() => {
     setMemes(memes)
@@ -30,15 +34,17 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
   }, [initialSlug, memes, openBySlug, setMemes])
 
   useEffect(() => {
-    const currentMeme = getCurrentMem()
-    setTimeout(() => {
-      router.replace(`/meme/${currentMeme.slug}`)
-    }, 20)
-  }, [currentIndex, router, getCurrentMem])
+    const currentMeme = getCurrentMeme()
+    if (currentMeme) {
+      setTimeout(() => {
+        router.replace(`/meme/${currentMeme.slug}`)
+      }, 20)
+    }
+  }, [router, getCurrentMeme])
 
   // const onNextClick = () => {
   //   next()
-  //   const nextMeme = storeMemes[currentIndex + 1]
+  //   const nextMeme = storeMemes[currentMemeIndex + 1]
   //   if (nextMeme) {
   //     router.replace(`/meme/${nextMeme.slug}`)
   //   }
@@ -46,41 +52,45 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
 
   // const onPrevClick = () => {
   //   prev()
-  //   const prevMeme = storeMemes[currentIndex - 1]
+  //   const prevMeme = storeMemes[currentMemeIndex - 1]
   //   if (prevMeme) {
   //     router.replace(`/meme/${prevMeme.slug}`)
   //   }
   // }
 
-  const currentMeme = getCurrentMem()
+  const currentMeme = getCurrentMeme()
+  const currentVariant = getCurrentVariant()
    // if (!meme) return null
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') next()
-      if (e.key === 'ArrowLeft') prev()
+      if (e.key === 'ArrowDown') nextMeme()
+      if (e.key === 'ArrowUp') prevMeme()
+      if (e.key === 'ArrowRight') nextVariant()
+      if (e.key === 'ArrowLeft') prevVariant()
       if (e.key === 'Escape') router.back()
     }
     window.addEventListener('keydown', handler)
 
     return () => window.removeEventListener('keydown', handler)
-  }, [currentMeme, next, prev, router])
+  }, [currentMeme, nextMeme, prevMeme, nextVariant, prevVariant, router])
 
+  // TODO: ОБЯЗАТЕЛЬНО ДОДЕЛАТЬ!! - ЭТО ПРЯМ ОСНОВНОЕ!
   // Preload следующего и предыдущего мемов
-  useEffect(() => {
-    const nextMeme = getNextMem()
-    const prevMeme = getPrevMem()
+  // useEffect(() => {
+  //   const nextMeme = getNextMem()
+  //   const prevMeme = getPrevMem()
 
-    if (nextMeme.variants[0]?.fileUrl) {
-      const img = new Image()
-      img.src = nextMeme.variants[0]?.fileUrl
-    }
+  //   if (nextMeme.variants[0]?.fileUrl) {
+  //     const img = new Image()
+  //     img.src = nextMeme.variants[0]?.fileUrl
+  //   }
 
-    if (prevMeme.variants[0]?.fileUrl) {
-      const img = new Image()
-      img.src = prevMeme.variants[0]?.fileUrl
-    }
-  }, [currentMeme, getNextMem, getPrevMem])
+  //   if (prevMeme.variants[0]?.fileUrl) {
+  //     const img = new Image()
+  //     img.src = prevMeme.variants[0]?.fileUrl
+  //   }
+  // }, [currentMeme, getNextMem, getPrevMem])
 
   const variants = {
     enter: (direction: number) => ({
@@ -102,22 +112,20 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
       className="fixed inset-0 bg-black/90 flex items-center justify-center overflow-hidden"
       onClick={() => router.back()}
     >
-      <AnimatePresence initial={false} custom={direction} mode='wait'>
+      <AnimatePresence initial={false} custom={verticalDirection} mode='wait'>
         <motion.div
-          key={currentIndex}
+          key={currentMemeIndex}
           className="relative"
           onClick={(e) => e.stopPropagation()}
 
           layout={false}
-          custom={direction}
+          custom={verticalDirection}
           variants={variants}
           initial="enter"
           animate="center"
           exit="exit"
           dragMomentum={false}
-
-          // 👉 drag
-          drag="x"
+          drag
           dragConstraints={{ left: 0, right: 0 }}
 
           // 👉 инерция + “резиновость”
@@ -128,13 +136,42 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
 
           // 👉 основной момент — snap логика
           onDragEnd={(e, info) => {
-            const offset = info.offset.x
-            const velocity = info.velocity.x
+            const offsetX = info.offset.x
+            const offsetY = info.offset.y
 
-            if (offset < -80 || velocity < -500) {
-              next()
-            } else if (offset > 80 || velocity > 500) {
-              prev()
+            const velocityX = info.velocity.x
+            const velocityY = info.velocity.y
+
+            const isHorizontal = Math.abs(offsetX) > Math.abs(offsetY)
+
+            if (isHorizontal) {
+              if (
+                offsetX < -80 ||
+                velocityX < -500
+              ) {
+                nextVariant()
+              }
+
+              else if (
+                offsetX > 80 ||
+                velocityX > 500
+              ) {
+                prevVariant()
+              }
+            } else {
+              if (
+                offsetY < -80 ||
+                velocityY < -500
+              ) {
+                nextMeme()
+              }
+
+              else if (
+                offsetY > 80 ||
+                velocityY > 500
+              ) {
+                prevMeme()
+              }
             }
           }}
 
@@ -145,23 +182,22 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
             damping: 30,
           }}
         >
-          <img
-            src={currentMeme.variants[0]?.fileUrl ??
-  currentMeme.previewUrl}
-            className="max-h-[90vh] max-w-[90vw] object-contain select-none pointer-events-none"
-            draggable={false}
+          <MemeVariantContent
+            variant={currentVariant}
           />
+
+          <MemeVariantStrip />
 
           {/* стрелки */}
           <button
-            onClick={prev}
+            onClick={prevMeme}
             className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-2xl p-4 bg-black rounded-full cursor-pointer"
           >
             ←
           </button>
 
           <button
-            onClick={next}
+            onClick={nextMeme}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-2xl  p-4 bg-black rounded-full cursor-pointer"
           >
             →

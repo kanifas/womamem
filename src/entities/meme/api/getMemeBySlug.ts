@@ -7,16 +7,41 @@ import { eq } from 'drizzle-orm'
 // НЕ меняй тип под БД
 // делай маппинг на уровне API
 export const getMemeBySlug = async (slug: string) => {
-  const [meme] = await db
-    .select()
-    .from(memeTable)
-    .where(eq(memeTable.slug, slug))
+  const result = await db.query.meme.findFirst({
+    where: eq(memeTable.slug, slug),
 
-  if (!meme) return null
+    with: {
+      variants: {
+        orderBy: (v, { asc }) => [
+          asc(v.sortOrder),
+        ],
+      },
+    },
+  })
+
+  if (!result) return null
 
   return {
-    ...meme,
-    description: meme.description ?? undefined, // меняем null на undefined
-    previewUrl: meme.previewUrl ?? undefined, // меняем null на undefined
+    ...result,
+
+    description:
+      result.description ?? undefined,
+
+    previewUrl:
+      result.previewUrl ?? undefined,
+
+    previewVariantId:
+      result.previewVariantId ?? undefined,
+
+    variants: result.variants.map((v) => ({
+      ...v,
+
+      thumbnailUrl:
+        v.thumbnailUrl ?? undefined,
+
+      width: v.width ?? undefined,
+
+      height: v.height ?? undefined,
+    })),
   }
 }
