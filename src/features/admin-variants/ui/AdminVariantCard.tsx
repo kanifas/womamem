@@ -94,7 +94,6 @@ export const AdminVariantCard: FC<Props> = ({
 
       {/* content */}
       <MediaRenderer
-        playsInline
         src={variant.fileUrl}
         format={variant.format}
         className="

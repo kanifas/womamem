@@ -1,4 +1,6 @@
-import { FC } from 'react'
+'use client'
+
+import { FC, useEffect, useRef } from 'react'
 import { MemeVariantFormat } from '@/entities'
 
 type Props = {
@@ -11,6 +13,7 @@ type Props = {
   playsInline?: boolean
   controls?: boolean
   poster?: string
+  isActive?: boolean
 }
 
 export const MediaRenderer: FC<Props> = ({
@@ -20,21 +23,40 @@ export const MediaRenderer: FC<Props> = ({
   autoPlay = true,
   muted = true,
   loop = true,
-  playsInline = false,
+  playsInline = true,
   controls = false,
   poster,
+  isActive = false
 }) => {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    if (isActive) {
+      video.play().catch(() => {})
+    } else {
+      video.pause()
+    }
+  }, [isActive])
+
   if (format === 'video') {
     return (
       <video
+        ref={videoRef}
         src={src}
+        className={className}
+
         poster={poster}
         autoPlay={autoPlay}
         muted={muted}
         loop={loop}
         playsInline={playsInline}
+
+        preload="metadata" // не грузит весь mp4 сразу
+
         controls={controls}
-        className={className}
       />
     )
   }

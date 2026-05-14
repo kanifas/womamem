@@ -19,6 +19,8 @@ export const MemePreview: FC<Props> = ({
         w-full
         object-cover
       "
+      isActive
+      autoPlay
     />
   )
 }

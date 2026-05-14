@@ -1,20 +1,24 @@
 'use client'
 
 import Link from 'next/link'
-import { FC, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { LikeButton } from '@/features'
 import { FavoriteButton } from '@/features'
 import { TMeme } from '@/entities'
 import { MemePreview } from './MemePreview'
 import { MediaRenderer } from '@/shared/ui/media/MediaRenderer'
+import { useMemeViewerStore } from '@/widgets/meme-viewer/model/store'
 
 type TProps = {
   meme: TMeme
 }
 
 export const MemeCard: FC<TProps> = ({ meme }) => {
-  const [activeVariantIndex, setActiveVariantIndex] = useState(0)
-  const activeVariant = meme.variants[activeVariantIndex]
+  const [variantIndex, setVariantIndex] = useState(0)
+
+  const activeVariant = meme.variants[
+    Math.min(variantIndex, meme.variants.length - 1)
+  ]
 
   return (
       <Link
@@ -44,8 +48,6 @@ export const MemeCard: FC<TProps> = ({ meme }) => {
               flex
               gap-2
               overflow-x-auto
-              scrollbar-none
-              snap-x
               px-2
             "
           >
@@ -55,21 +57,34 @@ export const MemeCard: FC<TProps> = ({ meme }) => {
                   key={variant.id}
                   onClick={(e) => {
                     e.preventDefault()
-                    setActiveVariantIndex(index)
+                    setVariantIndex(index)
                   }}
                   className={`
                     relative
-                    h-14
-                    w-14
+                    h-16
+                    w-16
                     shrink-0
                     overflow-hidden
-                    rounded-lg
+                    rounded-xl
                     border-2
                     transition
-                    ${
-                      activeVariantIndex === index
-                        ? 'scale-105 border-white'
-                        : 'opacity-70 border-transparent'
+
+                    snap-center
+                    transform-gpu
+                    will-change-transform
+
+                     ${
+                      variantIndex === index
+                        ? `
+                            border-white
+                            scale-[1.08]
+                            ring-2
+                            ring-white/40
+                          `
+                        : `
+                            border-transparent
+                            opacity-70
+                          `
                     }
                   `}
                 >
