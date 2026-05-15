@@ -29,13 +29,18 @@ export const MemeCard: FC<TProps> = ({ meme }) => {
           block
           overflow-hidden
           rounded-2xl
-          bg-zinc-950
           border
-          border-zinc-900
+          bg-[var(--color-bg)]
+          border-[var(--color-border)]
         "
       >
         {/* preview */}
-        <div className="relative">
+        <div  className="
+          relative
+          aspect-[4/5]
+          overflow-hidden
+          bg-black
+        ">
           <MemePreview
             variant={activeVariant}
           />

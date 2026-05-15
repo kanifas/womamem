@@ -1,6 +1,28 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
+import { ThemeProvider } from '@/features'
+import {
+  Header,
+  SearchBar,
+  CategoriesBar,
+  MobileBottomNav,
+} from '@/widgets'
+import { Inter, Bungee } from 'next/font/google'
 import "./globals.css"
+
+// Инициализируем шрифт.
+// subsets: ['latin'] — обязательный параметр для оптимизации загрузки.
+// display: 'swap' добавляется автоматически.
+const inter = Inter({
+  variable: "--font-inter-sans",
+  subsets: ['latin']
+})
+
+const bungee = Bungee({
+  variable: "--font-bungee-sans",
+  subsets: ['latin'],
+  weight: ["400"]
+})
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,14 +47,32 @@ export default function RootLayout({
   modal: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
-        {children}
-        {modal}
-      </body>
-    </html>
+    <ThemeProvider>
+      <html
+        lang="en"
+        className={`
+          ${geistSans.variable}
+          ${geistMono.variable}
+          ${bungee.variable}
+          ${inter.variable}
+          h-full
+          antialiased
+        `}
+      >
+        <body
+          className={`
+            min-h-full
+            flex
+            flex-col
+            bg-[var(--color-bg)]
+            text-[var(--color-text)]
+          `}
+        >
+
+          {children}
+          {modal}
+        </body>
+      </html>
+    </ThemeProvider>
   );
 }

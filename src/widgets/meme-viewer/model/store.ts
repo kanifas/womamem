@@ -22,7 +22,7 @@ type Store = {
   // prevVariant: () => void
   // getCurrentVariant: () => TMeme['variants'][0]
 
-  getCurrentMeme: () => TMeme
+  getCurrentMeme: () => TMeme | undefined
 }
 
 export const useMemeViewerStore = create<Store>((set, get) => ({

@@ -1,0 +1,100 @@
+:root {
+    --bg-color: #080808;
+    --text-main: #ffffff;
+    --accent: #00ff88;
+    --slogan-dim: #333;
+    --slogan-glow: #ffffff;
+}
+
+.darkThemeLogoSvg {
+  display: none;
+}
+
+.lightThemeLogoSvg {
+  display: block;
+}
+
+:global(.dark) {
+  .darkThemeLogoSvg {
+    display: block;
+  }
+
+  .lightThemeLogoSvg {
+    display: none;
+  }
+}
+
+.logo {
+  /* font-family: 'Inter', sans-serif; */
+  .mainText {
+    font-family: var(--font-bungee-sans), sans-serif;
+    font-size: 72px;
+    transform: translate(10, 80)
+  }
+
+  .subText {
+    font-family: var(--font-inter-sans), sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+  }
+
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Анимация мерцания для светлого фона */
+/* @keyframes neon-flicker {
+    0%, 100% { fill: #00cc66; filter: drop-shadow(0 0 8px rgba(0, 255, 136, 0.6)); }
+    50%, 100% { opacity: 1; }
+    5% { opacity: 0.1; }  Короткий сбой
+    6% { opacity: 1; }
+    15% { opacity: 0.2; }
+    17% { opacity: 0.8; }
+    20% { opacity: 0.3; }
+    21% { opacity: 1; }
+    30%, 40% { opacity: 1; }
+    41% { opacity: 0.4; } Небольшое падение яркости
+    43% { opacity: 0.9; }
+    45% { opacity: 1; }
+    50%, 60% { opacity: 1; }
+    61% { opacity: 0.5; }
+    62% { opacity: 0.1; }  Полный сбой
+    63% { opacity: 1; }
+    70%, 80% { opacity: 1; }
+    81% { opacity: 0.2; }
+    83% { opacity: 0.8; }
+    85% { opacity: 1; }
+    90% { opacity: 0.9; }
+    91% { opacity: 1; }
+} */
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  5% { opacity: 0.1; }  /* Короткий сбой */
+  6% { opacity: 1; }
+  15% { opacity: 0.2; }
+  17% { opacity: 0.8; }
+  20% { opacity: 0.3; }
+  21% { opacity: 1; }
+  30%, 40% { opacity: 1; }
+  41% { opacity: 0.4; } /* Небольшое падение яркости */
+  43% { opacity: 0.9; }
+  45% { opacity: 1; }
+  50%, 60% { opacity: 1; }
+  61% { opacity: 0.5; }
+  62% { opacity: 0.1; }  /* Полный сбой */
+  63% { opacity: 1; }
+  70%, 80% { opacity: 1; }
+  81% { opacity: 0.2; }
+  83% { opacity: 0.8; }
+  85% { opacity: 1; }
+  90% { opacity: 0.9; }
+  91% { opacity: 1; }
+}
+
+.flicker {
+  animation: flicker 4s infinite linear;
+}

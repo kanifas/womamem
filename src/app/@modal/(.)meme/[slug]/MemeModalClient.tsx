@@ -54,18 +54,28 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
   }, [memeIndex, getCurrentMeme, router])
 
   const currentMeme = getCurrentMeme()
-  const safeVariantIndex = Math.min(variantIndex, currentMeme.variants.length - 1)
-  const currentVariant = currentMeme.variants[safeVariantIndex]
+  const safeVariants = currentMeme?.variants ?? []
+  const safeVariantIndex = Math.min(
+    variantIndex,
+    Math.max(safeVariants.length - 1, 0),
+  )
+  const currentVariant = safeVariants[safeVariantIndex]
 
   const nextMeme = memes[(memeIndex + 1) % memes.length]
   const prevMeme = memes[(memeIndex - 1 + memes.length) % memes.length]
 
   const toNextVariant = useCallback(() => {
+    if (!currentMeme) {
+      return
+    }
     setVariantDirection(1)
     setVariantIndex(prevVariantIndex => (prevVariantIndex + 1) % currentMeme.variants.length)
   }, [currentMeme])
 
   const toPrevVariant = useCallback(() => {
+    if (!currentMeme) {
+      return
+    }
     setVariantDirection(-1)
     setVariantIndex(prevVariantIndex => (prevVariantIndex - 1 + currentMeme.variants.length) % currentMeme.variants.length)
   }, [currentMeme])
@@ -201,6 +211,10 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
     lastTapRef.current = now
   }
 
+  if (!currentMeme || !currentVariant) {
+    return null
+  }
+
   return (
     <div
       className="fixed inset-0 bg-black/90 flex items-center justify-center overflow-hidden"
@@ -216,8 +230,10 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
           className="
             relative
             flex
+            w-full
             flex-col
             items-center
+            justify-center
           "
           onClick={(e) => {
             e.stopPropagation()
@@ -308,6 +324,13 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
           >
             <motion.div
               key={currentVariant.id}
+              className="
+                relative
+                flex
+                w-full
+                items-center
+                justify-center
+              "
               variants={variantMotionVariants}
               initial="enter"
               animate="center"
@@ -319,29 +342,6 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
                 damping: 30,
               }}
             >
-              <AnimatePresence>
-                {showLikeBurst && (
-                  <motion.div
-                    initial={{scale: 0.5, opacity: 0,}}
-                    animate={{scale: 1.4,opacity: 0.8}}
-                    exit={{scale: 2, opacity: 0}}
-                    transition={{duration: 0.4}}
-                    className="
-                      pointer-events-none
-                      absolute
-                      left-1/2
-                      top-1/2
-                      z-50
-                      -translate-x-1/2
-                      -translate-y-1/2
-                      text-7xl
-                    "
-                  >
-                    🤘
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
               <MediaRenderer
                 src={currentVariant.fileUrl}
                 format={currentVariant.format}
@@ -374,6 +374,29 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
               >
                 →
               </button>
+
+              <AnimatePresence>
+                {showLikeBurst && (
+                  <motion.div
+                    initial={{scale: 0.5, opacity: 0,}}
+                    animate={{scale: 1.4,opacity: 0.8}}
+                    exit={{scale: 2, opacity: 0}}
+                    transition={{duration: 0.4}}
+                    className="
+                      pointer-events-none
+                      absolute
+                      left-1/2
+                      top-1/2
+                      z-50
+                      -translate-x-1/2
+                      -translate-y-1/2
+                      text-7xl
+                    "
+                  >
+                    🤘
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           </AnimatePresence>
         </motion.div>

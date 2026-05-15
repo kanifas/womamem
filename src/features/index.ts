@@ -7,3 +7,6 @@ export { AdminVariantCard } from './admin-variants/ui/AdminVariantCard'
 export { AdminVariantManager } from './admin-variants/ui/AdminVariantManager'
 export { getFileFormat } from './admin-variants/lib/getFileFormat'
 export type { VariantDraft } from './admin-variants/model/types'
+
+export { ThemeProvider } from './theme/ui/ThemeProvider'
+export { ThemeToggleButton } from './theme/ui/ThemeToggleButton'

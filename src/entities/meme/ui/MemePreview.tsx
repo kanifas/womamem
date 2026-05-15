@@ -8,14 +8,13 @@ type Props = {
   variant: MemeVariant
 }
 
-export const MemePreview: FC<Props> = ({
-  variant,
-}) => {
+export const MemePreview: FC<Props> = ({ variant }) => {
   return (
     <MediaRenderer
       src={variant.fileUrl}
       format={variant.format}
       className="
+        h-full
         w-full
         object-cover
       "

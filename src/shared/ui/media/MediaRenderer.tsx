@@ -1,5 +1,6 @@
 'use client'
 
+import clsx from 'clsx'
 import { FC, useEffect, useRef } from 'react'
 import { MemeVariantFormat } from '@/entities'
 
@@ -46,7 +47,14 @@ export const MediaRenderer: FC<Props> = ({
       <video
         ref={videoRef}
         src={src}
-        className={className}
+        className={clsx(
+          `
+            block
+            max-w-full
+            max-h-full
+          `,
+          className,
+        )}
 
         poster={poster}
         autoPlay={autoPlay}
@@ -64,7 +72,14 @@ export const MediaRenderer: FC<Props> = ({
   return (
     <img
       src={src}
-      className={className}
+      className={clsx(
+        `
+          block
+          max-w-full
+          max-h-full
+        `,
+        className,
+      )}
       draggable={false}
     />
   )
