@@ -2,20 +2,35 @@
 
 import { create } from 'zustand'
 
-type BottomSheetType =
+export type BottomSheetType =
   | 'comments'
   | 'share'
   | 'info'
   | null
 
-export const useThemeStore = create<Store>((set) => ({
-  theme: 'dark',
+type Store = {
+  isOpen: boolean
+  type: BottomSheetType
 
-  toggleTheme: () =>
-    set((state) => ({
-      theme:
-        state.theme === 'dark' ? 'light' : 'dark',
-    })),
+  open: (type: BottomSheetType) => void
+  close: () => void
+}
 
-  setTheme: (theme) => set({ theme }),
+export const useBottomSheetStore = create<Store>((set) => ({
+  isOpen: false,
+  type: null,
+
+  open: (type) => {
+    set({
+      isOpen: true,
+      type,
+    })
+  },
+
+  close: () => {
+    set({
+      isOpen: false,
+      type: null,
+    })
+  },
 }))

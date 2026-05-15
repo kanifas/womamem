@@ -2,11 +2,13 @@
 
 import { create } from 'zustand'
 
-type SheetStore = {
-  isOpen: boolean
-  type: BottomSheetType
-  open: (type: BottomSheetType) => void
-  close: () => void
+type Theme = 'light' | 'dark'
+
+type Store = {
+  theme: Theme
+
+  toggleTheme: () => void
+  setTheme: (theme: Theme) => void
 }
 
 export const useThemeStore = create<Store>((set) => ({
@@ -18,5 +20,5 @@ export const useThemeStore = create<Store>((set) => ({
         state.theme === 'dark' ? 'light' : 'dark',
     })),
 
-  setTheme: (theme) => set({ theme }),
+  setTheme: (theme) =>set({ theme }),
 }))

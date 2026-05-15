@@ -4,3 +4,6 @@ export { SearchBar } from './search/ui/SearchBar'
 export { MobileBottomNav } from './mobile-nav/ui/MobileBottomNav'
 export { CategoriesBar } from './categories/ui/CategoriesBar'
 export { FeedGrid } from './feed/ui/FeedGrid'
+
+export { BottomSheet } from './bottom-sheet/ui/BottomSheet'
+export { useBottomSheetStore, type BottomSheetType } from './bottom-sheet/model/store'

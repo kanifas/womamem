@@ -8,12 +8,14 @@ import { TMeme } from '@/entities'
 import { MemePreview } from './MemePreview'
 import { MediaRenderer } from '@/shared/ui/media/MediaRenderer'
 import { useMemeViewerStore } from '@/widgets/meme-viewer/model/store'
+import { useBottomSheetStore } from '@/widgets'
 
 type TProps = {
   meme: TMeme
 }
 
 export const MemeCard: FC<TProps> = ({ meme }) => {
+  const openBottomSheet = useBottomSheetStore((s) => s.open)
   const [variantIndex, setVariantIndex] = useState(0)
 
   const activeVariant = meme.variants[
@@ -136,7 +138,10 @@ export const MemeCard: FC<TProps> = ({ meme }) => {
                 ❤️
               </button>
 
-              <button className="transition hover:text-white">
+              <button
+                className="transition hover:text-white"
+                onClick={() => openBottomSheet('comments')}
+              >
                 💬
               </button>
 
