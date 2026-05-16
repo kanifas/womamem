@@ -3,7 +3,7 @@
 import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useMemeViewerStore } from '@/widgets/meme-viewer/model/store'
+import { useMemeViewerStore, useBottomSheetStore } from '@/widgets'
 import { TMeme } from '@/entities'
 import { MemeVariantStrip } from '@/widgets'
 import { MediaRenderer } from '@/shared/ui/media/MediaRenderer'

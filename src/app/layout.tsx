@@ -6,7 +6,7 @@ import {
   SearchBar,
   CategoriesBar,
   MobileBottomNav,
-  BottomSheet,
+  CommentsSheet,
 } from '@/widgets'
 import { Inter, Bungee } from 'next/font/google'
 import "./globals.css"
@@ -73,7 +73,7 @@ export default function RootLayout({
           {children}
           {modal}
 
-          <BottomSheet />
+          <CommentsSheet />
         </body>
       </html>
     </ThemeProvider>

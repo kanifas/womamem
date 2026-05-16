@@ -1,115 +1,158 @@
 'use client'
 
-import { FC, PropsWithChildren } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { RemoveScroll } from 'react-remove-scroll'
+import {
+  FC,
+  PropsWithChildren,
+  useRef,
+  useState,
+} from 'react'
+
+import { motion } from 'framer-motion'
 
 type Props = PropsWithChildren<{
-  isOpen?: boolean
-  onClose?: () => void
+  open: boolean
+  onClose: () => void
 }>
 
 export const BottomSheet: FC<Props> = ({
-  isOpen = false,
-  onClose = () => {},
+  open,
+  onClose,
   children,
 }) => {
+  const [snap, setSnap] = useState<
+    'collapsed' |
+    'medium' |
+    'expanded'
+  >('medium')
+
+  const scrollRef =
+    useRef<HTMLDivElement>(null)
+
+  const bottomRef =
+    useRef<HTMLDivElement>(null)
+
+  const inputRef =
+    useRef<HTMLInputElement>(null)
+
+  if (!open) return null
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <RemoveScroll>
-          <>
-            {/* backdrop */}
-            <motion.div
-              className="
-                fixed
-                inset-0
-                z-90
-                bg-black/60
-                backdrop-blur-sm
-              "
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={onClose}
-            />
+    <div
+      className="
+        fixed
+        inset-0
+        z-[200]
+        bg-black/50
+      "
+      onClick={onClose}
+    >
+      <motion.div
+        drag="y"
+        dragConstraints={{
+          top: 0,
+          bottom: 0,
+        }}
+        dragElastic={0.15}
+        dragMomentum={false}
+        initial={{ y: '100%' }}
+        animate={{
+          y:
+            snap === 'collapsed'
+              ? '70%'
+              : snap === 'medium'
+                ? '35%'
+                : '5%',
+        }}
+        transition={{
+          type: 'spring',
+          stiffness: 260,
+          damping: 30,
+        }}
+        onClick={(e) => {
+          e.stopPropagation()
+        }}
+        className="
+          absolute
+          inset-x-0
+          bottom-0
+          flex
+          h-[100dvh]
+          flex-col
+          rounded-t-3xl
+          border-t
+          border-[var(--color-border)]
+          bg-[var(--color-card)]
+        "
+      >
+        {/* handle */}
+        <div
+          className="
+            flex
+            justify-center
+            py-3
+          "
+        >
+          <div
+            className="
+              h-1.5
+              w-14
+              rounded-full
+              bg-zinc-500
+            "
+          />
+        </div>
 
-            {/* sheet */}
-            <motion.div
-              className="
-                fixed
-                bottom-0
-                left-0
-                right-0
-                z-[100]
+        {/* content */}
+        <div
+          ref={scrollRef}
+          className="
+            flex-1
+            overflow-y-auto
+            overscroll-contain
+            px-4
+          "
+        >
+          {children}
 
-                max-h-[85vh]
-                overflow-hidden
+          <div ref={bottomRef} />
+        </div>
 
-                rounded-t-3xl
-                border-t
-                border-[var(--color-border)]
+        {/* input */}
+        <div
+          className="
+            border-t
+            border-[var(--color-border)]
+            p-3
+            pb-[max(env(safe-area-inset-bottom),12px)]
+          "
+        >
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Написать комментарий..."
+            onFocus={() => {
+              setSnap('expanded')
 
-                bg-[var(--color-card)]
-                shadow-2xl
-              "
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{
-                type: 'spring',
-                stiffness: 260,
-                damping: 30,
-              }}
-
-              drag="y"
-              dragConstraints={{
-                top: 0,
-                bottom: 0,
-              }}
-              dragElastic={0.15}
-
-              onDragEnd={(e, info) => {
-                if (
-                  info.offset.y > 120 ||
-                  info.velocity.y > 700
-                ) {
-                  onClose()
-                }
-              }}
-            >
-              {/* handle */}
-              <div
-                className="
-                  flex
-                  justify-center
-                  py-3
-                "
-              >
-                <div
-                  className="
-                    h-1.5
-                    w-14
-                    rounded-full
-                    bg-zinc-500
-                  "
-                />
-              </div>
-
-              {/* content */}
-              <div
-                className="
-                  overflow-y-auto
-                  px-4
-                  pb-[max(env(safe-area-inset-bottom),24px)]
-                "
-              >
-                {children}
-              </div>
-            </motion.div>
-          </>
-        </RemoveScroll>
-      )}
-    </AnimatePresence>
+              requestAnimationFrame(() => {
+                bottomRef.current?.scrollIntoView({
+                  behavior: 'smooth',
+                })
+              })
+            }}
+            className="
+              w-full
+              rounded-2xl
+              border
+              border-[var(--color-border)]
+              bg-[var(--color-bg)]
+              px-4
+              py-3
+              text-[16px]
+              outline-none
+            "
+          />
+        </div>
+      </motion.div>
+    </div>
   )
 }

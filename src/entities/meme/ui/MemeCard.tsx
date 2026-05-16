@@ -140,7 +140,11 @@ export const MemeCard: FC<TProps> = ({ meme }) => {
 
               <button
                 className="transition hover:text-white"
-                onClick={() => openBottomSheet('comments')}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  openBottomSheet('comments')}
+                }
               >
                 💬
               </button>

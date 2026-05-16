@@ -1,24 +1,17 @@
 'use client'
 
+import { useRef } from 'react'
 import { BottomSheet } from './BottomSheet'
 import { useBottomSheetStore } from '../model/store'
 
 export const CommentsSheet = () => {
-  const isOpen = useBottomSheetStore(
-    (s) => s.isOpen,
-  )
-
-  const type = useBottomSheetStore(
-    (s) => s.type,
-  )
-
-  const close = useBottomSheetStore(
-    (s) => s.close,
-  )
+  const isOpen = useBottomSheetStore((s) => s.isOpen)
+  const type = useBottomSheetStore((s) => s.type)
+  const close = useBottomSheetStore((s) => s.close)
 
   return (
     <BottomSheet
-      isOpen={isOpen && type === 'comments'}
+      open={isOpen && type === 'comments'}
       onClose={close}
     >
       <div className="pb-10">
