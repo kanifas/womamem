@@ -227,6 +227,7 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
       >
         <motion.div
           key={memeIndex}
+          layoutId={`meme-${currentMeme.id}`}
           className="
             relative
             flex
@@ -315,6 +316,9 @@ export const MemeModalClient: FC<Props> = ({ initialSlug, memes }) => {
             type: 'spring',
             stiffness: 250,
             damping: 30,
+            layout: {
+              duration: 0.32,
+            }
           }}
         >
           <AnimatePresence

@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { FC, useEffect, useRef, useState } from 'react'
-import { LikeButton } from '@/features'
-import { FavoriteButton } from '@/features'
+import { motion } from 'framer-motion'
+// import { LikeButton } from '@/features'
+// import { FavoriteButton } from '@/features'
 import { TMeme } from '@/entities'
 import { MemePreview } from './MemePreview'
 import { MediaRenderer } from '@/shared/ui/media/MediaRenderer'
-import { useMemeViewerStore } from '@/widgets/meme-viewer/model/store'
+// import { useMemeViewerStore } from '@/widgets/meme-viewer/model/store'
 import { useBottomSheetStore } from '@/widgets'
 
 type TProps = {
@@ -37,16 +38,19 @@ export const MemeCard: FC<TProps> = ({ meme }) => {
         "
       >
         {/* preview */}
-        <div  className="
-          relative
-          aspect-[4/5]
-          overflow-hidden
-          bg-black
-        ">
+        <motion.div
+          layoutId={`meme-${meme.id}`}
+          className="
+            relative
+            aspect-4/5
+            overflow-hidden
+            bg-black
+          "
+        >
           <MemePreview
             variant={activeVariant}
           />
-        </div>
+        </motion.div>
 
         {meme.variants.length > 0 && (
           <div

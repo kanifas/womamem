@@ -5,9 +5,15 @@ import {
   PropsWithChildren,
   useRef,
   useState,
+  useEffect,
+  useMemo,
 } from 'react'
 
-import { motion } from 'framer-motion'
+import {
+  motion,
+  useMotionValue,
+  animate,
+} from 'framer-motion'
 
 type Props = PropsWithChildren<{
   open: boolean
@@ -19,20 +25,31 @@ export const BottomSheet: FC<Props> = ({
   onClose,
   children,
 }) => {
-  const [snap, setSnap] = useState<
-    'collapsed' |
-    'medium' |
-    'expanded'
-  >('medium')
+  const [snap, setSnap] = useState<'collapsed' | 'medium' | 'expanded'>('medium')
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const y = useMotionValue(0)
 
-  const scrollRef =
-    useRef<HTMLDivElement>(null)
+  const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1000
 
-  const bottomRef =
-    useRef<HTMLDivElement>(null)
+  const snapPoints = useMemo(() => ({
+    collapsed: viewportHeight * 0.7,
+    medium: viewportHeight * 0.35,
+    expanded: viewportHeight * 0.05,
+  }), [viewportHeight])
 
-  const inputRef =
-    useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    animate(
+      y,
+      snapPoints[snap],
+      {
+        type: 'spring',
+        stiffness: 320,
+        damping: 34,
+      },
+    )
+  }, [snap, snapPoints, y])
 
   if (!open) return null
 
@@ -41,33 +58,17 @@ export const BottomSheet: FC<Props> = ({
       className="
         fixed
         inset-0
-        z-[200]
+        z-200
         bg-black/50
       "
       onClick={onClose}
     >
       <motion.div
-        drag="y"
-        dragConstraints={{
-          top: 0,
-          bottom: 0,
-        }}
+        style={{ y }}
         dragElastic={0.15}
         dragMomentum={false}
-        initial={{ y: '100%' }}
-        animate={{
-          y:
-            snap === 'collapsed'
-              ? '70%'
-              : snap === 'medium'
-                ? '35%'
-                : '5%',
-        }}
-        transition={{
-          type: 'spring',
-          stiffness: 260,
-          damping: 30,
-        }}
+        initial={false}
+
         onClick={(e) => {
           e.stopPropagation()
         }}
@@ -85,11 +86,54 @@ export const BottomSheet: FC<Props> = ({
         "
       >
         {/* handle */}
-        <div
+        <motion.div
+          drag="y"
+          dragConstraints={{
+            top: 0,
+            bottom: 0,
+          }}
+          dragElastic={0.12}
+          dragMomentum={false}
+          onDrag={(e, info) => {
+            const nextY = snapPoints[snap] + info.offset.y
+            y.set(nextY)
+          }}
+          onDragEnd={(e, info) => {
+            const offset = info.offset.y
+            const velocity = info.velocity.y
+
+            if (offset > 120 || velocity > 900) {
+              if (snap === 'expanded') {
+                setSnap('medium')
+                return
+              }
+
+              if (snap === 'medium') {
+                setSnap('collapsed')
+                return
+              }
+
+              onClose()
+              return
+            }
+
+            if (offset < -120 || velocity < -900) {
+              if (snap === 'collapsed') {
+                setSnap('medium')
+                return
+              }
+
+              if (snap === 'medium') {
+                setSnap('expanded')
+              }
+            }
+          }}
           className="
             flex
             justify-center
             py-3
+            cursor-grab
+            active:cursor-grabbing
           "
         >
           <div
@@ -100,7 +144,7 @@ export const BottomSheet: FC<Props> = ({
               bg-zinc-500
             "
           />
-        </div>
+        </motion.div>
 
         {/* content */}
         <div
