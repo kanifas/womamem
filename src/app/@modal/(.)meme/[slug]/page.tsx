@@ -9,12 +9,14 @@ type Props = {
 
 export default async function MemeModal({ params }: Props) {
   const { slug } = await params
-  const memes = await getMemes()
+  const data = await getMemes({
+    limit: 50,
+  })
 
   return (
     <MemeModalClient
       initialSlug={slug}
-      memes={memes}
+      memes={data.items}
     />
   )
 }

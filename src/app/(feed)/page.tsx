@@ -9,7 +9,9 @@ import {
 import { getMemes } from '@/entities/server'
 
 export default async function Page() {
-  const memes = await getMemes()
+  const initialMemesData = await getMemes({
+    limit: 20,
+  })
   // console.log(
   //   JSON.stringify(memes, null, 2)
   // )
@@ -22,6 +24,7 @@ export default async function Page() {
           mx-auto
           min-w-0
           max-w-7xl
+          min-h-screen
           overflow-x-hidden
           px-4
           pb-24
@@ -32,10 +35,13 @@ export default async function Page() {
           <CategoriesBar />
         </div>
 
-        <FeedGrid memes={memes} />
+        <FeedGrid
+          initialItems={initialMemesData.items}
+          initialCursor={initialMemesData.nextCursor}
+        />
       </main>
 
-      <MobileBottomNav />
+      {/* <MobileBottomNav /> */}
     </>
   )
 }

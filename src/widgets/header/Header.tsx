@@ -19,16 +19,6 @@ export const Header = () => {
         backdrop-blur-xl
       "
     >
-      {/* <div
-        className="
-          text-xl
-          font-black
-          tracking-tight
-          text-yellow-400
-        "
-      >
-        MEMEZ
-      </div> */}
       <Logo />
 
       <div className="flex items-center gap-3">

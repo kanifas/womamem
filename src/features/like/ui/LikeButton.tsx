@@ -1,18 +1,31 @@
 'use client'
 
 import { FC } from 'react'
-import { TMeme } from '@/entities'
-import { useLike } from '../model/useLike'
+import { useLikeStore } from '../model/store'
 
-type TProps = {
-  memeId: TMeme['id']
+type Props = {
+  memeId: string
 }
 
-export const LikeButton: FC<TProps> = ({ memeId }) => {
-  const { liked, toggle } = useLike()
+export const LikeButton: FC<Props> = ({ memeId }) => {
+  const likedIds = useLikeStore((s) => s.likedIds)
+  const toggle = useLikeStore((s) => s.toggle)
+
+  const liked = likedIds.has(memeId)
 
   return (
-    <button onClick={() => toggle(memeId)}>
+    <button
+      onClick={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        toggle(memeId)
+      }}
+      className="
+        transition
+        active:scale-90
+      "
+    >
+      {/* 🤘 */}
       {liked ? '❤️' : '🤍'}
     </button>
   )

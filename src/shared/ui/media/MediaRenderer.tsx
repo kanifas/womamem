@@ -15,19 +15,21 @@ type Props = {
   controls?: boolean
   poster?: string
   isActive?: boolean
+  fit?: 'cover' | 'contain'
 }
 
 export const MediaRenderer: FC<Props> = ({
   src,
   format,
   className,
-  autoPlay = true,
+  autoPlay = false,
   muted = true,
   loop = true,
   playsInline = true,
   controls = false,
   poster,
-  isActive = false
+  isActive = false,
+  fit = 'contain'
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -52,6 +54,7 @@ export const MediaRenderer: FC<Props> = ({
             block
             max-w-full
             max-h-full
+            ${fit === 'cover' ? 'object-cover' : 'object-contain'}
           `,
           className,
         )}
@@ -62,7 +65,8 @@ export const MediaRenderer: FC<Props> = ({
         loop={loop}
         playsInline={playsInline}
 
-        preload="metadata" // не грузит весь mp4 сразу
+        // preload="metadata" // не грузит весь mp4 сразу
+        preload="none" // Иначе virtualization теряет смысл
 
         controls={controls}
       />
@@ -77,9 +81,12 @@ export const MediaRenderer: FC<Props> = ({
           block
           max-w-full
           max-h-full
+          ${fit === 'cover' ? 'object-cover' : 'object-contain'}
         `,
         className,
       )}
+      loading="lazy"
+      decoding="async"
       draggable={false}
     />
   )

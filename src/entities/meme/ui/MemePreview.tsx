@@ -6,9 +6,19 @@ import type { MemeVariant } from '../model/types'
 
 type Props = {
   variant: MemeVariant
+  isActive?: boolean
+  autoplay?: boolean
+  loop?: boolean
+  muted?: boolean
 }
 
-export const MemePreview: FC<Props> = ({ variant }) => {
+export const MemePreview: FC<Props> = ({
+  variant,
+  isActive = false,
+  autoplay = false,
+  muted = false,
+  loop = false,
+}) => {
   return (
     <MediaRenderer
       src={variant.fileUrl}
@@ -16,10 +26,12 @@ export const MemePreview: FC<Props> = ({ variant }) => {
       className="
         h-full
         w-full
-        object-cover
       "
-      isActive
-      autoPlay
+      fit='cover'
+      isActive={isActive}
+      autoPlay={autoplay}
+      muted={muted}
+      loop={loop}
     />
   )
 }
