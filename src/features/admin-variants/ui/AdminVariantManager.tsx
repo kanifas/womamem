@@ -72,21 +72,44 @@ export const AdminVariantManager: FC<Props> = ({
             xl:grid-cols-4
           "
         >
-          {variants.map((variant, index) => (
-            <AdminVariantCard
-              key={variant.id}
-              variant={variant}
-              active={index === 0}
-              onDelete={() => {
-                setVariants(
-                  variants.filter(
-                    (v) =>
-                      v.id !== variant.id,
-                  ),
-                )
-              }}
-            />
-          ))}
+          {variants.map((variant, index) => {
+            const hasAnotherOriginal = variants.some((v) => v.id !== variant.id && v.style === 'original')
+
+            return (
+              <AdminVariantCard
+                key={variant.id}
+                variant={variant}
+                active={index === 0}
+                disableOriginal={
+                  hasAnotherOriginal
+                }
+                onChange={(nextVariant) => {
+                  setVariants(
+                    variants.map((v) =>
+                      v.id === nextVariant.id
+                        ? nextVariant
+                        : nextVariant.style
+                            === 'original'
+                            && v.style === 'original'
+                          ? {
+                              ...v,
+                              style: 'sticker',
+                            }
+                          : v,
+                    ),
+                  )
+                }}
+                onDelete={() => {
+                  setVariants(
+                    variants.filter(
+                      (v) =>
+                        v.id !== variant.id,
+                    ),
+                  )
+                }}
+              />
+            )
+          })}
         </div>
       </SortableContext>
     </DndContext>

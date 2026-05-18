@@ -37,12 +37,12 @@ export const MediaRenderer: FC<Props> = ({
     const video = videoRef.current
     if (!video) return
 
-    if (isActive) {
+    if (isActive && autoPlay) {
       video.play().catch(() => {})
     } else {
       video.pause()
     }
-  }, [isActive])
+  }, [isActive, autoPlay])
 
   if (format === 'video') {
     return (

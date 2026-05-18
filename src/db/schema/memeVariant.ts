@@ -27,6 +27,8 @@ export const memeVariant = pgTable('meme_variant', {
 
   thumbnailUrl: text('thumbnail_url'),
 
+  posterUrl: text('poster_url'),
+
   width: integer('width'),
   height: integer('height'),
 

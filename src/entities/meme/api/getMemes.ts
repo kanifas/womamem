@@ -67,6 +67,7 @@ export const getMemes = async ({ cursor, limit = 20 }: Params): Promise<GetMemes
       style: v.style as MemeVariantStyle,
       role: v.role as MemeVariantRole,
       thumbnailUrl: v.thumbnailUrl ?? undefined,
+      posterUrl: v.posterUrl ?? undefined,
       width: v.width ?? undefined,
       height: v.height ?? undefined,
       fps: v.fps ?? undefined,

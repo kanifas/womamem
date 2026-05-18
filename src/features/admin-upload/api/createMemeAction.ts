@@ -13,6 +13,7 @@ type Input = {
 
   variants: {
     file: File
+    posterFile?: File
     style: string
     format: string
     role: string
@@ -44,6 +45,22 @@ export const createMemeAction = async (input: Input) => {
         key,
       })
 
+      let posterUrl: string | null = null
+      if (variant.posterFile) {
+        const posterExtension =
+          variant.posterFile.name
+            .split('.')
+            .pop()
+
+        const posterKey = `${process.env.CLOUD_RU_BUCKET_FOLDER_PATH}/${createdMeme.id}/poster-${crypto.randomUUID()}.${posterExtension}`
+
+        posterUrl = await uploadToS3({
+          file: variant.posterFile,
+          key: posterKey,
+        })
+      }
+
+
       console.log(fileUrl)
       const insertedVariant = await db
         .insert(memeVariant)
@@ -55,6 +72,7 @@ export const createMemeAction = async (input: Input) => {
           role: variant.role,
 
           fileUrl,
+          posterUrl,
 
           sortOrder: i,
         })
@@ -69,11 +87,8 @@ export const createMemeAction = async (input: Input) => {
       await db
         .update(meme)
         .set({
-          previewUrl:
-            firstVariant.fileUrl,
-
-          previewVariantId:
-            firstVariant.id,
+          previewUrl: firstVariant.posterUrl || firstVariant.fileUrl,
+          previewVariantId: firstVariant.id,
         })
         .where(
           eq(meme.id, createdMeme.id),

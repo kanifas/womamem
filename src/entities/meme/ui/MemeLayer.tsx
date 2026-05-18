@@ -50,6 +50,7 @@ export const MemeLayer: FC<Props> = ({
     >
       <MediaRenderer
         src={variant.fileUrl}
+        poster={variant.posterUrl}
         format={variant.format}
         fit={isVertical ? 'cover' : 'contain'}
         isActive={active}

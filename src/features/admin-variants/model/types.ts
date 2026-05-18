@@ -8,9 +8,10 @@ export type VariantDraft = {
   id: string
 
   file?: File
-
   fileUrl: string
 
+  posterFile?: File
+  posterUrl?: string
   thumbnailUrl?: string
 
   style: MemeVariantStyle

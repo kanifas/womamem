@@ -2,87 +2,44 @@
 
 import { FC } from 'react';
 import Link from 'next/link';
-import { Layout, theme, Card, Col, Row, Statistic } from 'antd';
-import { ArrowDownOutlined, ShoppingCartOutlined, PlusCircleTwoTone } from '@ant-design/icons';
-
-
-const { Header, Content } = Layout;
-
-// const menuItems = [
-//   {
-//     key: 'main',
-//     label: <Link  href="/admin">Главная</Link>,
-//   },
-//   {
-//     key: 'Настройки',
-//     label: <a href="/admin/settings">Настройки</a>,
-//   }
-// ];
+import { Card, Col, Row, Statistic } from 'antd';
+import { PlusCircleTwoTone } from '@ant-design/icons';
 
 const App: FC = () => {
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
-
   return (
-    <Layout>
-      <Header style={{ display: 'flex', alignItems: 'center' }}>
-        <div className="demo-logo" />
-        {/* <Menu
-          theme="dark"
-          mode="horizontal"
-          defaultSelectedKeys={['2']}
-          items={menuItems}
-          style={{ flex: 1, minWidth: 0 }}
-        /> */}
-      </Header>
-      <Content style={{ padding: '0 48px' }}>
-        {/* <Breadcrumb
-          style={{ margin: '16px 0' }}
-          items={[{ title: 'Home' }, { title: 'List' }, { title: 'App' }]}
-        /> */}
-        <div
-          style={{
-            background: colorBgContainer,
-            minHeight: 280,
-            padding: 24,
-            borderRadius: borderRadiusLG,
-          }}
-        >
-          {/* Ряд с плашками */}
-          <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12} lg={6}>
-              <Link href="/admin/create">
-                <Card title="Новый мем" variant="outlined" hoverable style={{textAlign: 'center'}}>
-                  <PlusCircleTwoTone style={{fontSize: '80px'}} />
-                </Card>
-              </Link>
-            </Col>
+    <div>
+      {/* Ряд с плашками */}
+      <Row gutter={[16, 16]}>
+        <Col xs={24} sm={12} lg={6}>
+          <Link href="/admin/create">
+            <Card title="Новый мем" variant="outlined" hoverable style={{textAlign: 'center'}}>
+              <PlusCircleTwoTone style={{fontSize: '80px'}} />
+            </Card>
+          </Link>
+        </Col>
 
-            <Col xs={24} sm={12} lg={6}>
-              <Link href="/admin/create">
-                <Card title="Other..." variant="outlined" hoverable style={{textAlign: 'center'}}>
+        <Col xs={24} sm={12} lg={6}>
+          <Link href="/admin/create">
+            <Card title="Other..." variant="outlined" hoverable style={{textAlign: 'center'}}>
 
-                </Card>
-              </Link>
-            </Col>
+            </Card>
+          </Link>
+        </Col>
 
-            <Col xs={24} sm={12} lg={6}>
-              <Card variant='borderless' hoverable>
-                <Statistic title="Конверсия" value={11.28} precision={2} suffix="%" />
-              </Card>
-            </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card variant='borderless' hoverable>
+            <Statistic title="Конверсия" value={11.28} precision={2} suffix="%" />
+          </Card>
+        </Col>
 
-            <Col xs={24} sm={12} lg={6}>
-              <Card variant='borderless' hoverable>
-                <Statistic title="Выручка (₽)" value={542100} precision={0} />
-              </Card>
-            </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card variant='borderless' hoverable>
+            <Statistic title="Выручка (₽)" value={542100} precision={0} />
+          </Card>
+        </Col>
 
-          </Row>
-        </div>
-      </Content>
-    </Layout>
+      </Row>
+    </div>
   );
 };
 

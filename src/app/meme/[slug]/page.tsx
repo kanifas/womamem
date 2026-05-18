@@ -18,6 +18,7 @@ export default async function MemePage({ params }: Props) {
     <div className="p-4">
       <MediaRenderer
         src={meme.variants[0]?.fileUrl}
+        poster={meme.variants[0]?.posterUrl}
         // TODO: Сделать MemeVariantFormat одним источником правдв в БД а не в ентитис
         format={meme.variants[0]?.format as MemeVariantFormat}
       />

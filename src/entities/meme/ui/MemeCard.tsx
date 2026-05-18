@@ -61,8 +61,10 @@ export const MemeCard: FC<TProps> = ({
         >
           <MediaRenderer
             src={activeVariant.fileUrl}
+            poster={activeVariant.posterUrl}
             format={activeVariant.format}
             isActive={isVisible}
+            autoPlay={isVisible}
           />
 
           {meme.variants.length > 0 && (
@@ -114,6 +116,7 @@ export const MemeCard: FC<TProps> = ({
                   >
                     <MediaRenderer
                       src={variant.fileUrl}
+                      poster={variant.posterUrl}
                       format={variant.format}
                       fit = 'contain'
                       className="

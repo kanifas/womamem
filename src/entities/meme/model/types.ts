@@ -42,6 +42,7 @@ export type MemeVariant = {
   format: MemeVariantFormat
   role: MemeVariantRole
   fileUrl: string
+  posterUrl?: string
   thumbnailUrl?: string
   width?: number
   height?: number
