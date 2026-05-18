@@ -10,12 +10,17 @@ type Params = {
 
   onNext: () => void
   onPrev: () => void
+
+  canGoNext: boolean
+  canGoPrev: boolean
 }
 
 export const useVerticalSwipe = ({
   containerRef,
   onNext,
   onPrev,
+  canGoNext,
+  canGoPrev,
 }: Params) => {
   const pointerStartY = useRef(0)
   const pointerStartX = useRef(0)
@@ -32,36 +37,77 @@ export const useVerticalSwipe = ({
 
   const velocityY = useRef(0)
 
-  const currentTranslateY =
-    useRef(0)
+  const currentTranslateY = useRef(0)
 
   const animateTo = (
     target: number,
+    initialVelocity = 0,
+    onComplete?: () => void,
   ) => {
-    const element =
-      containerRef.current
+    const element = containerRef.current
 
     if (!element) {
       return
     }
 
-    element.style.transition =
-      'transform 280ms cubic-bezier(0.22, 1, 0.36, 1)'
+    let position = currentTranslateY.current
+    // ultra-native TikTok feel:
+    // let velocity = initialVelocity * 8
+    // const stiffness = 0.07
+    // const damping = 0.62
+    let velocity = initialVelocity * 10
+    const stiffness = 0.075
+    const damping = 0.68
+    const epsilon = 0.5
 
-    element.style.transform = `
-      translate3d(
-        0,
-        ${target}px,
-        0
-      )
-    `
+    const animate = () => {
+      const distance = target - position
+      const springForce = distance * stiffness
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        element.style.transition =
-          ''
-      })
-    })
+      velocity += springForce
+
+      velocity *= damping
+
+      position += velocity
+
+      // Это (два ниже if) убирает
+      // микродрожание
+      // lingering frames
+      // subpixel wobble
+      // tail oscillation.
+      if (Math.abs(target - position) < epsilon) {
+        position = target
+      }
+      if (Math.abs(velocity) < 0.01) {
+        velocity = 0
+      }
+
+      element.style.transform = `
+        translate3d(
+          0,
+          ${position}px,
+          0
+        )
+      `
+
+      if (Math.abs(velocity) < epsilon && Math.abs(distance) < epsilon) {
+        element.style.transform = `
+          translate3d(
+            0,
+            ${target}px,
+            0
+          )
+        `
+
+        currentTranslateY.current = target
+        onComplete?.()
+        return
+      }
+
+      requestAnimationFrame(animate)
+    }
+
+    requestAnimationFrame(animate)
   }
 
   const handlePointerDown = (
@@ -85,24 +131,15 @@ export const useVerticalSwipe = ({
       performance.now()
   }
 
-  const handlePointerMove = (
-    e: React.PointerEvent,
-  ) => {
+  const handlePointerMove = (e: React.PointerEvent) => {
     if (!dragging.current) {
       return
     }
 
-    const deltaX =
-      e.clientX
-      - pointerStartX.current
+    const deltaX = e.clientX - pointerStartX.current
+    const deltaY = e.clientY - pointerStartY.current
 
-    const deltaY =
-      e.clientY
-      - pointerStartY.current
-
-    if (
-      !lockedDirection.current
-    ) {
+    if (!lockedDirection.current) {
       const absX =
         Math.abs(deltaX)
 
@@ -129,31 +166,33 @@ export const useVerticalSwipe = ({
       }
     }
 
-    const resistedDelta =
-      deltaY * 0.92
+    const tryingToGoNext = deltaY < 0
+    const tryingToGoPrev =  deltaY > 0
+    const blocked = (tryingToGoNext && !canGoNext) || (tryingToGoPrev && !canGoPrev)
 
-    const now =
-      performance.now()
+    const absDelta = Math.abs(deltaY)
 
-    const deltaTime =
-      now
-      - lastMoveTime.current
+    const direction = deltaY < 0 ? -1 : 1
+
+    const resistanceFactor = blocked ? 0.006 : 0.015
+
+    const resistedDelta = (1 - (1 / (absDelta * resistanceFactor + 1)))
+      * absDelta
+      * direction
+
+    const now = performance.now()
+
+    const deltaTime = now - lastMoveTime.current
 
     if (deltaTime > 0) {
-      velocityY.current =
-        (
-          resistedDelta
-          - currentTranslateY.current
-        ) / deltaTime
+      velocityY.current = (resistedDelta - currentTranslateY.current) / deltaTime
     }
 
     lastMoveTime.current = now
 
-    currentTranslateY.current =
-      resistedDelta
+    currentTranslateY.current = resistedDelta
 
-    const element =
-      containerRef.current
+    const element = containerRef.current
 
     if (!element) {
       return
@@ -179,54 +218,71 @@ export const useVerticalSwipe = ({
     const velocityThreshold = 0.7
 
     if (
-      deltaY < -distanceThreshold
-      || velocityY.current
-      < -velocityThreshold
+      canGoNext
+      && (
+        deltaY < -distanceThreshold
+        || velocityY.current
+        < -velocityThreshold
+      )
     ) {
-      animateTo(-window.innerHeight)
+      animateTo(
+        -window.innerHeight,
+        velocityY.current,
+        () => {
+          onNext()
 
-      setTimeout(() => {
-        onNext()
+          const element =
+            containerRef.current
 
-        const element =
-          containerRef.current
+          if (!element) {
+            return
+          }
 
-        if (!element) {
-          return
-        }
+          element.style.transform =
+            'translate3d(0,0,0)'
 
-        element.style.transform =
-          'translate3d(0,0,0)'
-      }, 220)
+          currentTranslateY.current = 0
+        },
+      )
 
       return
     }
 
     if (
-      deltaY > distanceThreshold
-      || velocityY.current
-      > velocityThreshold
+      canGoPrev
+      && (
+        deltaY > distanceThreshold
+        || velocityY.current
+        > velocityThreshold
+      )
     ) {
-      animateTo(window.innerHeight)
+      animateTo(
+        window.innerHeight,
+        velocityY.current,
+        () => {
+          onPrev()
 
-      setTimeout(() => {
-        onPrev()
+          const element =
+            containerRef.current
 
-        const element =
-          containerRef.current
+          if (!element) {
+            return
+          }
 
-        if (!element) {
-          return
-        }
+          element.style.transform =
+            'translate3d(0,0,0)'
 
-        element.style.transform =
-          'translate3d(0,0,0)'
-      }, 220)
+          currentTranslateY.current = 0
+        },
+      )
 
       return
     }
 
-    animateTo(0)
+    animateTo(
+      0,
+      velocityY.current,
+    )
   }
 
   return {
@@ -235,3 +291,17 @@ export const useVerticalSwipe = ({
     handlePointerUp,
   }
 }
+
+// масса
+// физичность
+// плавность
+// native feel
+
+// Следующий шаг После этого уже можно:
+
+// rubber band edges Rubber-band physics (как iOS)
+// resistance zones
+// overscroll physics
+// predictive next rendering
+// horizontal variant swipe
+// media lifecycle manager

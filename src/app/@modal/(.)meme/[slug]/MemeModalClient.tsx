@@ -28,57 +28,34 @@ export const MemeModalClient: FC<Props> = ({
 }) => {
   const router = useRouter()
   const containerRef = useRef<HTMLDivElement>(null)
+  const setMemes = useMemeViewerStore((s) => s.setMemes)
+  const openBySlug = useMemeViewerStore((s) => s.openBySlug)
+  const memeIndex = useMemeViewerStore((s) => s.memeIndex)
+  const getCurrentMeme = useMemeViewerStore((s) => s.getCurrentMeme)
+  const toNextMeme = useMemeViewerStore((s) => s.toNextMeme)
+  const toPrevMeme = useMemeViewerStore((s) => s.toPrevMeme)
 
-  const toNextMeme =
-    useMemeViewerStore(
-      (s) => s.toNextMeme,
-    )
-
-  const toPrevMeme =
-    useMemeViewerStore(
-      (s) => s.toPrevMeme,
-    )
-
-    const {
-    handlePointerDown,
-    handlePointerMove,
-    handlePointerUp,
+  const {
+      handlePointerDown,
+      handlePointerMove,
+      handlePointerUp,
   } = useVerticalSwipe({
     containerRef,
+
     onNext: toNextMeme,
     onPrev: toPrevMeme,
+
+    canGoNext: memeIndex < memes.length - 1,
+
+    canGoPrev: memeIndex > 0,
   })
-
-  const setMemes =
-    useMemeViewerStore(
-      (s) => s.setMemes,
-    )
-
-  const openBySlug =
-    useMemeViewerStore(
-      (s) => s.openBySlug,
-    )
-
-  const memeIndex =
-    useMemeViewerStore(
-      (s) => s.memeIndex,
-    )
-
-  const getCurrentMeme =
-    useMemeViewerStore(
-      (s) => s.getCurrentMeme,
-    )
 
   useEffect(() => {
     setMemes(memes)
-
     openBySlug(initialSlug)
-  }, [
-    initialSlug,
-    memes,
-    openBySlug,
-    setMemes,
-  ])
+    // only mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     const currentMeme =
@@ -101,20 +78,14 @@ export const MemeModalClient: FC<Props> = ({
     getCurrentMeme()
 
   const nextMeme =
-    memes[
-      Math.min(
-        memeIndex + 1,
-        memes.length - 1,
-      )
-    ]
+    memeIndex < memes.length - 1
+      ? memes[memeIndex + 1]
+      : undefined
 
   const prevMeme =
-    memes[
-      Math.max(
-        memeIndex - 1,
-        0,
-      )
-    ]
+    memeIndex > 0
+      ? memes[memeIndex - 1]
+      : undefined
 
   useEffect(() => {
     const handler = (

@@ -45,23 +45,15 @@ export const useMemeViewerStore = create<Store>((set, get) => ({
     }
   },
 
-  toNextMeme: () => {
-    const { memeIndex, memes } = get()
-    const nextIndex = (memeIndex + 1) % memes.length
-    set({
-      memeIndex: nextIndex,
-      verticalDirection: 1,
-    })
-  },
+  toNextMeme: () =>
+    set((state) => ({
+      memeIndex: (state.memeIndex + 1) % state.memes.length,
+    })),
 
-  toPrevMeme: () => {
-    const { memeIndex, memes } = get()
-    const prevIndex = (memeIndex - 1 + memes.length) % memes.length
-    set({
-      memeIndex: prevIndex,
-      verticalDirection: -1,
-    })
-  },
+  toPrevMeme: () =>
+    set((state) => ({
+      memeIndex: Math.max(state.memeIndex - 1, 0,),
+    })),
 
   // nextVariant: () => {
   //   const {variantIndex, getCurrentMeme } = get()
